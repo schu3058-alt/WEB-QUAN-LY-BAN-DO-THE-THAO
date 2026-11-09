@@ -1,0 +1,12 @@
+-- Cac rang buoc bo sung ngoai khoa chinh/khoa ngoai da khai bao trong taoBang.sql
+-- (SQLite gioi han ALTER TABLE nen phan lon rang buoc duoc dat truc tiep luc tao bang;
+--  file nay ghi lai cac rang buoc nghiep vu can luu y khi phat trien)
+
+-- 1) Email trong tai_khoan phai duy nhat (da co UNIQUE trong taoBang.sql)
+-- 2) Moi tai khoan chi co 1 dong gio_hang_chi_tiet cho mot san pham (UNIQUE taiKhoanId + sanPhamId)
+-- 3) soLuongTon khong duoc am (CHECK trong taoBang.sql); viec tru kho phai nam trong transaction
+--    cung voi tao don_hang_chi_tiet (xem backend/modules/donHang/donHang.service.js)
+-- 4) Ma khuyen_mai la duy nhat va ngayKetThuc phai sau ngayBatDau (kiem tra o tang ung dung
+--    qua Joi, xem backend/modules/khuyenMai/khuyenMai.validation.js)
+-- 5) trangThai cua don_hang chi nhan 1 trong 4 gia tri: cho_xac_nhan, dang_giao, da_giao, da_huy
+--    (kiem tra o tang ung dung, co the nang cap thanh CHECK constraint khi can)

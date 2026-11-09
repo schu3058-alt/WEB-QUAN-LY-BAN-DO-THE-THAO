@@ -1,0 +1,10 @@
+-- Tom tat so do CSDL SportShop (xem chi tiet dang hinh ve tai taiLieu/soDoCoSoDuLieu.md)
+--
+-- tai_khoan (1) ----< gio_hang_chi_tiet >---- (1) san_pham ----< danh_muc (N-1)
+-- tai_khoan (1) ----< don_hang ----< don_hang_chi_tiet >---- san_pham
+-- don_hang  (1) ----< thanh_toan
+-- tai_khoan (1) ----< danh_gia >---- (1) san_pham
+-- tai_khoan (1) ----< thong_bao
+-- khuyen_mai: bang doc lap, ap dung o tang ung dung khi tao don_hang
+--
+-- Xem chi tiet cau truc tung bang tai database/taoBang.sql
