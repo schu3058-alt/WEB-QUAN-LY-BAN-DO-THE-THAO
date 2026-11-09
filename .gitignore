@@ -1,7 +1,0 @@
-node_modules/
-.env
-database/*.sqlite
-tepTaiLen/*
-!tepTaiLen/.gitkeep
-*.log
-coverage/
