@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý sản phẩm | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="quanLySanPham">
+    <div class="tieu-de-trang"><p class="mo-ta">Cập nhật danh mục hàng hóa và tồn kho</p><h1>Quản lý sản phẩm</h1></div>
+    <div id="thong-bao-quan-ly-san-pham" class="thong-bao" role="status" hidden></div>
+    <form id="form-san-pham" class="khung-noi-dung">
+      <input name="id" type="hidden">
+      <h2 id="tieu-de-form-san-pham">Thêm sản phẩm</h2>
+      <div class="luoi-form">
+        <label class="truong">Tên sản phẩm<input name="ten" minlength="2" maxlength="150" required></label>
+        <label class="truong">Giá (VND)<input name="gia" type="number" min="1" step="1" required></label>
+        <label class="truong">Số lượng tồn<input name="soLuongTon" type="number" min="0" step="1" required></label>
+        <label class="truong">Danh mục<select name="danhMucId" required></select></label>
+        <label class="truong">Đường dẫn hình ảnh (URL)<input name="hinhAnh" type="url"></label>
+      </div>
+      <label class="truong">Mô tả<textarea name="moTa" maxlength="2000"></textarea></label>
+      <div class="hang-nut"><button class="nut" type="submit">Lưu sản phẩm</button><button id="huy-sua" class="nut nut-phu" type="button">Xóa trắng</button></div>
+    </form>
+    <section class="khung-noi-dung">
+      <h2>Danh mục</h2>
+      <form id="form-danh-muc" class="thanh-cong-cu">
+        <input name="id" type="hidden">
+        <input name="ten" required minlength="2" maxlength="100" placeholder="Tên danh mục">
+        <input name="moTa" maxlength="500" placeholder="Mô tả">
+        <button id="nut-luu-danh-muc" class="nut" type="submit">Thêm danh mục</button>
+        <button id="huy-sua-danh-muc" class="nut nut-phu" type="button" hidden>Hủy sửa</button>
+      </form>
+      <div id="danh-sach-danh-muc"></div>
+    </section>
+    <section>
+      <h2>Danh sách sản phẩm</h2>
+      <div id="danh-sach-san-pham"></div>
+    </section>
+  </main>
+  <footer class="chan-trang">Khu vực quản trị SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/quanLySanPham/quanLySanPham.js"></script>
+</body>
+</html>

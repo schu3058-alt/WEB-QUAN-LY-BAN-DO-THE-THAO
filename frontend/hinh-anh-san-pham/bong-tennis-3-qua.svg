@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="tieu-de">
+  <title id="tieu-de">Bóng tennis (ống 3 quả)</title>
+  <defs><linearGradient id="nen" x2="1" y2="1"><stop stop-color="#f2f7f3"/><stop offset="1" stop-color="#dceae2"/></linearGradient><filter id="bong" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#26443a" flood-opacity=".16"/></filter></defs>
+  <rect width="640" height="480" rx="30" fill="url(#nen)"/>
+  <circle cx="536" cy="91" r="76" fill="#a7bd3f" opacity=".1"/>
+  <circle cx="98" cy="343" r="98" fill="#a7bd3f" opacity=".08"/>
+  <rect x="32" y="28" width="576" height="424" rx="24" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <g filter="url(#bong)"><circle cx="268" cy="215" r="105" fill="#a7bd3f" stroke="#273941" stroke-width="7"/><path d="m238 143 30-18 30 18-11 34h-38zm-41 53 30-19m82 19-30-19m-22 64v-64m-52 17-17 30m109-30 17 30" fill="#273941" stroke="#273941" stroke-width="9" stroke-linejoin="round"/></g>
+  <path d="M42 363h556" stroke="#aec5b8" stroke-width="2"/>
+  <text x="320" y="400" text-anchor="middle" fill="#243a32" font-family="Arial,sans-serif" font-size="25" font-weight="700">Bóng tennis (ống</text>
+  <text x="320" y="432" text-anchor="middle" fill="#243a32" font-family="Arial,sans-serif" font-size="23" font-weight="700">3 quả)</text>
+  <text x="320" y="343" text-anchor="middle" fill="#587166" font-family="Arial,sans-serif" font-size="16" letter-spacing="3">SPORTSHOP</text>
+</svg>

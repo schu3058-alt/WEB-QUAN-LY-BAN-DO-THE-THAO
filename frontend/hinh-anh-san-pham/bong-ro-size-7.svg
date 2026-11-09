@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="tieu-de">
+  <title id="tieu-de">Bóng rổ size 7</title>
+  <defs><linearGradient id="nen" x2="1" y2="1"><stop stop-color="#f2f7f3"/><stop offset="1" stop-color="#dceae2"/></linearGradient><filter id="bong" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#26443a" flood-opacity=".16"/></filter></defs>
+  <rect width="640" height="480" rx="30" fill="url(#nen)"/>
+  <circle cx="536" cy="91" r="76" fill="#d98732" opacity=".1"/>
+  <circle cx="98" cy="343" r="98" fill="#d98732" opacity=".08"/>
+  <rect x="32" y="28" width="576" height="424" rx="24" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <g filter="url(#bong)"><circle cx="268" cy="215" r="105" fill="#d98732" stroke="#273941" stroke-width="7"/><path d="M267 117c-30 27-44 62-44 98s14 71 44 98m2-196c30 27 44 62 44 98s-14 71-44 98M173 215h188M194 150c46 35 99 35 146 0m-146 130c46-35 99-35 146 0" fill="none" stroke="#273941" stroke-width="8"/></g>
+  <path d="M42 363h556" stroke="#aec5b8" stroke-width="2"/>
+  <text x="320" y="400" text-anchor="middle" fill="#243a32" font-family="Arial,sans-serif" font-size="25" font-weight="700">Bóng rổ size 7</text>
+  
+  <text x="320" y="343" text-anchor="middle" fill="#587166" font-family="Arial,sans-serif" font-size="16" letter-spacing="3">SPORTSHOP</text>
+</svg>

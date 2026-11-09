@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý đơn hàng | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="quanLyDonHang">
+    <div class="tieu-de-trang"><p class="mo-ta">Theo dõi, xử lý và cập nhật đơn hàng</p><h1>Quản lý đơn hàng</h1></div>
+    <div id="thong-bao-quan-ly-don-hang" class="thong-bao" role="status" hidden></div>
+    <label class="truong" style="max-width:300px">Lọc trạng thái
+      <select id="loc-trang-thai">
+        <option value="">Tất cả trạng thái</option>
+        <option value="cho_xac_nhan">Chờ xác nhận</option>
+        <option value="dang_giao">Đang giao</option>
+        <option value="da_giao">Đã giao</option>
+        <option value="da_huy">Đã hủy</option>
+      </select>
+    </label>
+    <div id="danh-sach-don-hang"></div>
+  </main>
+  <footer class="chan-trang">Khu vực quản trị SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/quanLyDonHang/quanLyDonHang.js"></script>
+</body>
+</html>

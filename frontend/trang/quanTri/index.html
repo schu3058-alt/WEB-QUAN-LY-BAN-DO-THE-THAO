@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bảng điều khiển | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="quanTri">
+    <div class="tieu-de-trang"><p class="mo-ta">Tổng quan hoạt động của cửa hàng</p><h1>Bảng điều khiển quản trị</h1></div>
+    <div id="thong-bao-quan-tri" class="thong-bao" role="status" hidden></div>
+    <section id="thong-ke-quan-tri" class="thong-ke"></section>
+    <nav class="danh-sach-lien-ket" aria-label="Quản trị">
+      <a class="nut" href="/quan-tri/san-pham">Quản lý sản phẩm</a>
+      <a class="nut" href="/quan-tri/don-hang">Quản lý đơn hàng</a>
+      <a class="nut" href="/quan-tri/bao-cao">Báo cáo doanh thu</a>
+    </nav>
+    <section><h2>Sản phẩm bán chạy</h2><div id="san-pham-ban-chay"></div></section>
+    <section class="khung-noi-dung" style="margin-top:28px">
+      <h2>Quản lý mã khuyến mãi</h2>
+      <form id="form-khuyen-mai" class="thanh-cong-cu">
+        <label class="truong">Mã khuyến mãi<input name="ma" minlength="3" maxlength="30" required></label>
+        <label class="truong">Phần trăm giảm<input name="phanTramGiam" type="number" min="1" max="100" step="1" required></label>
+        <label class="truong">Ngày bắt đầu<input name="ngayBatDau" type="date" required></label>
+        <label class="truong">Ngày kết thúc<input name="ngayKetThuc" type="date" required></label>
+        <button class="nut" type="submit">Tạo mã</button>
+      </form>
+      <div id="thong-bao-khuyen-mai-quan-tri" class="thong-bao" role="status" hidden></div>
+      <div id="danh-sach-khuyen-mai"></div>
+    </section>
+  </main>
+  <footer class="chan-trang">Khu vực quản trị SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/quanTri/quanTri.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đánh giá sản phẩm | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="danhGiaSanPham">
+    <div class="tieu-de-trang"><p class="mo-ta">Ý kiến của bạn giúp SportShop phục vụ tốt hơn</p><h1>Đánh giá sản phẩm</h1></div>
+    <div id="thong-bao-danh-gia" class="thong-bao" role="status" hidden></div>
+    <div id="san-pham-da-mua"></div>
+    <section id="vung-form-danh-gia" class="form-khung" hidden>
+      <h2 id="ten-san-pham-danh-gia"></h2>
+      <form id="form-danh-gia">
+        <label class="truong">Số sao
+          <select name="soSao" required><option value="5">5 sao</option><option value="4">4 sao</option><option value="3">3 sao</option><option value="2">2 sao</option><option value="1">1 sao</option></select>
+        </label>
+        <label class="truong">Nội dung
+          <textarea name="noiDung" maxlength="1000"></textarea>
+        </label>
+        <button class="nut" type="submit">Gửi đánh giá</button>
+      </form>
+    </section>
+  </main>
+  <footer class="chan-trang">SportShop</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/danhGiaSanPham/danhGiaSanPham.js"></script>
+</body>
+</html>

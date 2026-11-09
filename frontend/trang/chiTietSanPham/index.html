@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chi tiết sản phẩm | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="chiTietSanPham">
+    <p><a href="/san-pham">← Quay lại danh sách sản phẩm</a></p>
+    <div id="thong-bao-chi-tiet" class="thong-bao" role="status" hidden></div>
+    <section id="chi-tiet-san-pham" class="chi-tiet-san-pham"></section>
+    <section>
+      <h2>Đánh giá sản phẩm</h2>
+      <div id="danh-sach-danh-gia"></div>
+      <form id="form-danh-gia" class="form-khung">
+        <h3>Chia sẻ trải nghiệm của bạn</h3>
+        <label class="truong">Số sao
+          <select name="soSao" required>
+            <option value="5">5 sao - Rất tốt</option><option value="4">4 sao - Tốt</option>
+            <option value="3">3 sao - Bình thường</option><option value="2">2 sao - Chưa tốt</option>
+            <option value="1">1 sao - Không hài lòng</option>
+          </select>
+        </label>
+        <label class="truong">Nội dung
+          <textarea name="noiDung" maxlength="1000" placeholder="Nhập nhận xét của bạn"></textarea>
+        </label>
+        <button class="nut" type="submit">Gửi đánh giá</button>
+      </form>
+    </section>
+  </main>
+  <footer class="chan-trang">SportShop</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/chiTietSanPham/chiTietSanPham.js"></script>
+</body>
+</html>

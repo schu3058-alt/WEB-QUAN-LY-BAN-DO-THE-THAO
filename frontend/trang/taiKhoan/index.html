@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tài khoản | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="taiKhoan">
+    <div class="tieu-de-trang"><p class="mo-ta">Thông tin cá nhân và liên hệ</p><h1>Tài khoản của tôi</h1></div>
+    <div id="thong-bao-tai-khoan" class="thong-bao" role="status" hidden></div>
+    <form id="form-tai-khoan" class="form-khung">
+      <label class="truong">Họ và tên
+        <input name="hoTen" minlength="2" maxlength="100" required autocomplete="name">
+      </label>
+      <label class="truong">Địa chỉ email
+        <input name="email" type="email" readonly>
+      </label>
+      <label class="truong">Số điện thoại
+        <input name="soDienThoai" type="tel" pattern="[0-9]{9,11}" autocomplete="tel">
+      </label>
+      <button class="nut" type="submit">Lưu thay đổi</button>
+    </form>
+    <section>
+      <h2>Thông báo của bạn</h2>
+      <div id="danh-sach-thong-bao"></div>
+    </section>
+  </main>
+  <footer class="chan-trang">Thông tin tài khoản được bảo mật.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/taiKhoan/taiKhoan.js"></script>
+</body>
+</html>

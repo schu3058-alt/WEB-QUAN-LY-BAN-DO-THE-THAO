@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thanh toán | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="thanhToan">
+    <div class="tieu-de-trang"><p class="mo-ta">Chỉ còn một bước nữa</p><h1>Thông tin đặt hàng</h1></div>
+    <div id="thong-bao-thanh-toan" class="thong-bao" role="status" hidden></div>
+    <div class="chi-tiet-san-pham">
+      <form id="form-thanh-toan" class="khung-noi-dung">
+        <h2>Thông tin nhận hàng</h2>
+        <label class="truong">Địa chỉ nhận hàng
+          <textarea name="diaChiNhan" required minlength="5" maxlength="255"></textarea>
+        </label>
+        <label class="truong">Số điện thoại nhận hàng
+          <input name="soDienThoaiNhan" type="tel" pattern="[0-9]{9,11}" required>
+        </label>
+        <label class="truong">Ghi chú
+          <textarea name="ghiChu" maxlength="500"></textarea>
+        </label>
+        <label class="truong">Phương thức thanh toán
+          <select name="phuongThuc" required>
+            <option value="tien_mat">Thanh toán khi nhận hàng</option>
+            <option value="chuyen_khoan">Chuyển khoản</option>
+            <option value="vi_dien_tu">Ví điện tử</option>
+          </select>
+        </label>
+        <button id="nut-dat-hang" class="nut" type="submit">Xác nhận đặt hàng</button>
+      </form>
+      <section class="khung-noi-dung">
+        <h2>Đơn hàng của bạn</h2>
+        <div id="tom-tat-gio-hang"></div>
+        <label class="truong">Mã khuyến mãi
+          <input id="ma-khuyen-mai" type="text" maxlength="30" autocomplete="off" placeholder="Nhập mã khuyến mãi">
+        </label>
+        <button id="nut-ap-dung-khuyen-mai" class="nut nut-phu" type="button">Áp dụng mã</button>
+        <div id="thong-bao-khuyen-mai" class="thong-bao" role="status" hidden></div>
+      </section>
+    </div>
+  </main>
+  <footer class="chan-trang">Cảm ơn bạn đã mua sắm tại SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/thanhToan/thanhToan.js"></script>
+</body>
+</html>

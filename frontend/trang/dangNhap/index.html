@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng nhập | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="dangNhap">
+    <section class="form-khung">
+      <p class="mo-ta">Chào mừng trở lại SportShop</p>
+      <h1 id="tieu-de-xac-thuc">Đăng nhập</h1>
+      <div id="thong-bao-dang-nhap" class="thong-bao" role="status" hidden></div>
+      <form id="form-xac-thuc">
+        <div id="truong-ho-ten" class="truong" hidden>
+          <label for="ho-ten">Họ và tên</label>
+          <input id="ho-ten" name="hoTen" minlength="2" maxlength="100" autocomplete="name">
+        </div>
+        <label class="truong">Địa chỉ email
+          <input name="email" type="email" required autocomplete="email">
+        </label>
+        <label class="truong">Mật khẩu
+          <input name="matKhau" type="password" required minlength="6" autocomplete="current-password">
+        </label>
+        <div id="truong-so-dien-thoai" class="truong" hidden>
+          <label for="so-dien-thoai">Số điện thoại</label>
+          <input id="so-dien-thoai" name="soDienThoai" type="tel" pattern="[0-9]{9,11}" autocomplete="tel">
+        </div>
+        <button id="nut-xac-thuc" class="nut" type="submit">Đăng nhập</button>
+      </form>
+      <p><button id="doi-che-do" class="nut nut-phu" type="button">Chưa có tài khoản? Đăng ký</button></p>
+    </section>
+  </main>
+  <footer class="chan-trang">Thông tin của bạn được bảo mật an toàn.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/dangNhap/dangNhap.js"></script>
+</body>
+</html>

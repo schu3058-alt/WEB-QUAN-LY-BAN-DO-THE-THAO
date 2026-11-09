@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Báo cáo doanh thu | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="baoCaoDoanhThu">
+    <div class="tieu-de-trang"><p class="mo-ta">Theo dõi kết quả kinh doanh theo thời gian</p><h1>Báo cáo doanh thu</h1></div>
+    <div id="thong-bao-bao-cao" class="thong-bao" role="status" hidden></div>
+    <form id="form-bao-cao" class="thanh-cong-cu">
+      <label class="truong">Từ ngày<input name="tuNgay" type="date" required></label>
+      <label class="truong">Đến ngày<input name="denNgay" type="date" required></label>
+      <button class="nut" type="submit">Xem báo cáo</button>
+    </form>
+    <section id="tong-doanh-thu" class="thong-ke"></section>
+    <div id="bang-doanh-thu"></div>
+  </main>
+  <footer class="chan-trang">Báo cáo dành cho quản trị SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/baoCaoDoanhThu/baoCaoDoanhThu.js"></script>
+</body>
+</html>
