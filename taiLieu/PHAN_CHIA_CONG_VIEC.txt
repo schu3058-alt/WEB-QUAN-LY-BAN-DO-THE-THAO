@@ -1,0 +1,16 @@
+PHAN CHIA CONG VIEC - DU AN SPORTSHOP
+======================================
+
+TV1 - Truong nhom / PM
+  - Dieu phoi tien do, bao cao, tai lieu quan ly du an
+
+TV2 - Frontend
+  - Giao dien khach hang va quan tri (HTML/CSS/JS trong thu muc frontend/)
+
+TV3 - Backend/DB
+  - API, co so du lieu, nghiep vu xu ly (thu muc backend/ va database/)
+
+TV4 - Testing/Tai lieu
+  - Kiem thu (thu muc kiemThu/), tai lieu dac ta (thu muc taiLieu/)
+
+Chi tiet phan cong theo tung Sprint: xem file phanChiaCongViec.md
