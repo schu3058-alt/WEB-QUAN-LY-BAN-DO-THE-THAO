@@ -1,16 +1,237 @@
-PHAN CHIA CONG VIEC - DU AN SPORTSHOP
-======================================
+====================================================================
 
-TV1 - Truong nhom / PM
-  - Dieu phoi tien do, bao cao, tai lieu quan ly du an
+        PHAN CONG CONG VIEC DU AN SPORTSHOP (5 THANH VIEN)
 
-TV2 - Frontend
-  - Giao dien khach hang va quan tri (HTML/CSS/JS trong thu muc frontend/)
+====================================================================
 
-TV3 - Backend/DB
-  - API, co so du lieu, nghiep vu xu ly (thu muc backend/ va database/)
 
-TV4 - Testing/Tai lieu
-  - Kiem thu (thu muc kiemThu/), tai lieu dac ta (thu muc taiLieu/)
 
-Chi tiet phan cong theo tung Sprint: xem file phanChiaCongViec.md
+Thong tin chung:
+
+- Du an: He thong Website Quan ly & Ban hang Dung cu The thao (SportShop)
+
+- Quy mo: 5 thanh vien
+
+- Cong nghe: Node.js (Express), SQLite, Vanilla JS / HTML5 / CSS3, Jest Test
+
+
+
+--------------------------------------------------------------------
+
+1. TONG QUAN PHAN CONG VAI TRO
+
+--------------------------------------------------------------------
+
+
+
+[Thanh vien 1] - Backend Lead & Authentication
+
+  + Linh vuc: Core Server, Middleware, Bao mat, Tai khoan
+
+
+
+[Thanh vien 2] - Backend Business Developer
+
+  + Linh vuc: Modules San pham, Don hang, Gio hang, Khuyen mai & Tac vu nen
+
+
+
+[Thanh vien 3] - Frontend Client Developer
+
+  + Linh vuc: Giao dien Khach hang (Trang chu, San pham, Gio hang, Thanh toan)
+
+
+
+[Thanh vien 4] - Frontend Admin & UI/UX
+
+  + Linh vuc: Giao dien Quan tri (Admin Dashboard, Quan ly kho, Doanh thu)
+
+
+
+[Thanh vien 5] - Database Architect & QA Tester
+
+  + Linh vuc: Co so du lieu SQLite, Viet & thuc thi bo Kiem thu (Automation Test)
+
+
+
+
+
+--------------------------------------------------------------------
+
+2. CHI TIET NHIEM VU & THU MUC PHU TRACH
+
+--------------------------------------------------------------------
+
+
+
+--- THANH VIEN 1: Backend Lead & Authentication ---
+
+- Nhiem vu chinh:
+
+  * Thiet lap cau hinh he thong server, bien moi truong va ket noi CSDL (backend/cauHinh/)
+
+  * Xay dung he thong Middleware: Xac thuc JWT, phan quyen RBAC, gioi han rate-limit, xu ly loi trung tam (backend/middleware/)
+
+  * Lap trinh module Quan ly Tai khoan & Dang nhap / Dang ky (backend/modules/taiKhoan/)
+
+  * Viet cac ham tien ich dung chung: Ma hoa mat khau, lam sach HTML, dinh dang phan hoi API (backend/tienIch/)
+
+- Thu muc quan ly:
+
+  * backend/cauHinh/
+
+  * backend/middleware/
+
+  * backend/modules/taiKhoan/
+
+  * backend/tienIch/
+
+
+
+--- THANH VIEN 2: Backend Business Developer ---
+
+- Nhiem vu chinh:
+
+  * Lap trinh logic nghiep vu San pham, Danh muc & Danh gia (backend/modules/sanPham/, danhMuc/, danhGia/)
+
+  * Xu ly cac luong nghiep vu Gio hang, Don hang & Thanh toan (backend/modules/gioHang/, donHang/, thanhToan/)
+
+  * Phat trien module Khuyen mai & Thong bao (backend/modules/khuyenMai/, thongBao/)
+
+  * Lap trinh cac tac vu tu dong chay ngam: Huy don hang qua han, tong hop doanh thu theo ngay (backend/tacVuNen/)
+
+- Thu muc quan ly:
+
+  * backend/modules/sanPham/
+
+  * backend/modules/danhMuc/
+
+  * backend/modules/danhGia/
+
+  * backend/modules/gioHang/
+
+  * backend/modules/donHang/
+
+  * backend/modules/thanhToan/
+
+  * backend/modules/khuyenMai/
+
+  * backend/modules/thongBao/
+
+  * backend/modules/baoCao/
+
+  * backend/tacVuNen/
+
+
+
+--- THANH VIEN 3: Frontend Client Developer ---
+
+- Nhiem vu chinh:
+
+  * Xay dung giao dien Khach hang: Trang chu, Danh sach san pham, Chi tiet san pham (frontend/trang/trangChu/, danhSachSanPham/, chiTietSanPham/)
+
+  * Phat trien giao dien Mua hang: Gio hang, Thanh toan, Theo doi don hang (frontend/trang/gioHang/, thanhToan/, theoDoiDonHang/)
+
+  * Xay dung trang Ho so ca nhan & Danh gia san pham (frontend/trang/taiKhoan/, danhGiaSanPham/)
+
+  * Ket noi API Backend voi giao dien phia nguoi dung thong qua frontend/dungChung/api.js
+
+- Thu muc quan ly:
+
+  * frontend/trang/trangChu/
+
+  * frontend/trang/danhSachSanPham/
+
+  * frontend/trang/chiTietSanPham/
+
+  * frontend/trang/gioHang/
+
+  * frontend/trang/thanhToan/
+
+  * frontend/trang/theoDoiDonHang/
+
+  * frontend/trang/taiKhoan/
+
+  * frontend/trang/danhGiaSanPham/
+
+  * frontend/trang/dangNhap/
+
+
+
+--- THANH VIEN 4: Frontend Admin & UI/UX ---
+
+- Nhiem vu chinh:
+
+  * Xay dung Bang dieu khien Quan tri vien Admin Dashboard (frontend/trang/quanTri/)
+
+  * Xay dung giao dien Quan ly San pham & Danh muc cho Admin (frontend/trang/quanLySanPham/)
+
+  * Phat trien trang Quan ly Don hang & Bao cao Doanh thu (frontend/trang/quanLyDonHang/, baoCaoDoanhThu/)
+
+  * Chuan hoa cac thanh phan giao dien dung chung, dinh tuyen client-side va tai nguyen hinh anh SVG (frontend/thanhPhan/, dinhTuyen/, hinh-anh-san-pham/)
+
+- Thu muc quan ly:
+
+  * frontend/trang/quanTri/
+
+  * frontend/trang/quanLySanPham/
+
+  * frontend/trang/quanLyDonHang/
+
+  * frontend/trang/baoCaoDoanhThu/
+
+  * frontend/thanhPhan/
+
+  * frontend/dinhTuyen/
+
+  * frontend/tepGiaoDien.css
+
+  * frontend/hinh-anh-san-pham/
+
+
+
+--- THANH VIEN 5: Database Architect & QA Tester ---
+
+- Nhiem vu chinh:
+
+  * Thiet ke so do CSDL, khoi tao bang, thiet lap rang buoc khoa ngoai & chi muc tim kiem (database/)
+
+  * Viet script khoi tao CSDL va chen du lieu mau cho toan bo he thong (database/duLieuMau.sql, themSanPhamMau.js)
+
+  * Xay dung va thuc thi cac bo kiem thu tu dong (Jest Framework) cho 7 nhom tinh nang:
+
+    + Kiem thu API truc tiep (kiemThu/api/)
+
+    + Kiem thu Bao mat & Xac thuc (kiemThu/baoMat/)
+
+    + Kiem thu Xu ly Dong thoi ton kho (kiemThu/dongThoi/)
+
+    + Kiem thu Nghiep vu Dat hang & Khuyen mai (kiemThu/nghiepVu/)
+
+    + Kiem thu Phan quyen & Thanh toan (kiemThu/phanQuyen/, thanhToan/)
+
+- Thu muc quan ly:
+
+  * database/
+
+  * kiemThu/
+
+
+
+
+
+--------------------------------------------------------------------
+
+3. TIEN DO CONG VIEC (CHECKLIST)
+
+--------------------------------------------------------------------
+
+[ ] Thanh vien 1: Hoan thien ket noi DB, JWT Auth & Middleware phan quyen
+
+[ ] Thanh vien 2: Hoan thien API San pham, Don hang, Gio hang & Tac vu nen
+
+[ ] Thanh vien 3: Complete Giao dien nguoi dung (Client Web Flow)
+
+[ ] Thanh vien 4: Complete Trang Quan tri Admin & Thong ke Doanh thu
+
+[ ] Thanh vien 5: Dat 100% test cases thanh cong (API, Security, Concurrency, Business)
