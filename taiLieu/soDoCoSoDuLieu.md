@@ -24,3 +24,9 @@ khuyen_mai — bang doc lap, ap dung o tang ung dung khi tao don_hang
 
 Script tao bang day du: Moi don hang chi co toi da mot ban ghi thanh toan (`UNIQUE(donHangId)`).
 Script tao bang day du: `database/taoBang.sql`. Chi muc: `database/chiMuc.sql`.
+
+## Rang buoc va chi muc
+- Email tai khoan khong phan biet hoa thuong; slug danh muc, ma khuyen mai, thanh toan theo don va san pham trong gio hang deu duy nhat theo quy tac tuong ung.
+- CHECK rang buoc gioi han gia/tien va so luong khong am, trang thai hop le, ten danh muc khong rong, phan tram giam 1-100, so sao 1-5 va `daDoc` chi nhan 0/1.
+- Chi muc bao phu khoa ngoai va cac truy van loc theo trang thai, ten san pham, tai khoan, don hang, san pham, danh gia va thong bao.
+- EF Core migrations la nguon schema chinh thuc. CSDL cu duoc kiem tra du lieu va khoa ngoai truoc khi them chi muc/rang buoc bang trigger; neu co vi pham thi migration dung va giu nguyen du lieu.

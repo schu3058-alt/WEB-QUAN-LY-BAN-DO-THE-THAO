@@ -13,25 +13,45 @@ const KhuyenMaiService = {
   layTatCa: () => KhuyenMaiModel.layTatCa(),
 
   taoMoi(duLieu) {
-    const daTonTai = KhuyenMaiModel.timTheoMa(duLieu.ma);
+    const ma = String(duLieu.ma || '').trim().toUpperCase();
+    const daTonTai = KhuyenMaiModel.timTheoMa(ma);
     if (daTonTai) {
       const loi = new Error('Mã khuyến mãi đã tồn tại');
       loi.maTrangThai = 409;
       throw loi;
     }
-    return KhuyenMaiModel.taoMoi(duLieu);
+    return KhuyenMaiModel.taoMoi({ ...duLieu, ma });
   },
 
   apDung(ma, tongTienGoc) {
-    const khuyenMai = KhuyenMaiModel.timTheoMa(ma);
+    const maKhuyenMai = String(ma || '').trim().toUpperCase();
+    const tongTien = Number(tongTienGoc);
+    if (!maKhuyenMai) {
+      const loi = new Error('Thiếu mã khuyến mãi');
+      loi.maTrangThai = 400;
+      throw loi;
+    }
+    if (!Number.isFinite(tongTien) || tongTien <= 0) {
+      const loi = new Error('Tổng tiền đơn hàng không hợp lệ');
+      loi.maTrangThai = 400;
+      throw loi;
+    }
+
+    const khuyenMai = KhuyenMaiModel.timTheoMa(maKhuyenMai);
     const hienTai = new Date();
     if (!khuyenMai || !dangTrongThoiHan(khuyenMai, hienTai)) {
       const loi = new Error('Mã khuyến mãi không hợp lệ hoặc đã hết hạn');
       loi.maTrangThai = 400;
       throw loi;
     }
-    const soTienGiam = (tongTienGoc * khuyenMai.phanTramGiam) / 100;
-    return { tongTienGoc, soTienGiam, tongTienSauGiam: tongTienGoc - soTienGiam };
+
+    const soTienGiam = (tongTien * khuyenMai.phanTramGiam) / 100;
+    return {
+      ma: maKhuyenMai,
+      tongTienGoc: tongTien,
+      soTienGiam,
+      tongTienSauGiam: tongTien - soTienGiam,
+    };
   },
 
   xoa(id) {

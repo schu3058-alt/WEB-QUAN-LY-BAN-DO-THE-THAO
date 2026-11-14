@@ -1,19 +1,19 @@
 {
   "name": "sportshop",
   "version": "1.0.0",
-  "description": "He thong quan ly ban do the thao SportShop (backend Node.js/Express + SQLite, frontend thuan HTML/CSS/JS)",
-  "main": "backend/mayChu.js",
+  "description": "SportShop (ASP.NET Core MVC + SQLite, frontend HTML/CSS/JavaScript)",
   "scripts": {
-    "start": "node backend/mayChu.js",
-    "dev": "nodemon backend/mayChu.js",
-    "test": "jest --runInBand",
+    "start": "dotnet run --project backend\\SportShop.Mvc\\SportShop.Mvc.csproj",
+    "dev": "dotnet watch --project backend\\SportShop.Mvc\\SportShop.Mvc.csproj",
+    "test": "dotnet test backend\\SportShop.Mvc.Tests\\SportShop.Mvc.Tests.csproj",
+    "test:node-legacy": "jest --runInBand",
     "products:add": "node database/themSanPhamMau.js",
-    "db:init": "node database/khoiTao.js",
-    "db:seed": "node database/khoiTao.js --seed"
+    "db:init": "dotnet run --project backend\\SportShop.Mvc\\SportShop.Mvc.csproj -- --migrate-only",
+    "db:seed": "dotnet run --project backend\\SportShop.Mvc\\SportShop.Mvc.csproj -- --seed-only"
   },
   "dependencies": {
-    "better-sqlite3": "^9.4.3",
     "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.6.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

@@ -12,6 +12,11 @@ const ThanhToanService = {
         loi.maTrangThai = 404;
         throw loi;
       }
+      if (donHang.trangThai === 'da_huy') {
+        const loi = new Error('Không thể thanh toán đơn hàng đã hủy');
+        loi.maTrangThai = 409;
+        throw loi;
+      }
       const thanhToanDaCo = ThanhToanModel.timTheoDonHang(donHangId);
       if (thanhToanDaCo) {
         const loi = new Error('Đơn hàng đã có yêu cầu thanh toán');

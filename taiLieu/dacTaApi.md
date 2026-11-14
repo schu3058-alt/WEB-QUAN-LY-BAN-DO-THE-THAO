@@ -1,8 +1,8 @@
 # Dac ta API — SportShop
 
-Dia chi goc: `http://localhost:3000/api`
+Dia chi goc: `http://localhost:5150/api`
 Dinh dang phan hoi chuan: `{ "thanhCong": boolean, "thongBao": string, "duLieu": any }`
-Giao dien web duoc phuc vu tai `http://localhost:3000`; endpoint kiem tra may chu la `/api/health`.
+Giao dien web duoc phuc vu tai `http://localhost:5150`; endpoint kiem tra may chu la `/api/health`.
 
 ## Tai khoan (`/tai-khoan`)
 | Method | Duong dan      | Mo ta                     | Can dang nhap |

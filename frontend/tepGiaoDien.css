@@ -120,6 +120,7 @@ h2 { margin-top: 32px; }
 .thanh-cong-cu > * { flex: 1 1 180px; }
 .luoi-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .truong { display: grid; gap: 6px; margin: 14px 0; }
+.truong[hidden] { display: none; }
 .truong label { font-weight: 700; }
 input, select, textarea {
   width: 100%;

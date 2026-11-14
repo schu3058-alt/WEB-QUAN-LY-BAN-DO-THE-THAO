@@ -19,4 +19,15 @@ describe('Middleware phanQuyen', () => {
     expect(phanHoi.maTrangThai).toBe(403);
     expect(tiepTheo).not.toHaveBeenCalled();
   });
+
+  it('cho phep nguoi dung vai tro quan_tri truy cap route chi danh cho quan_tri', () => {
+    const yeuCau = { nguoiDung: { id: 99, vaiTro: 'quan_tri' } };
+    const phanHoi = taoPhanHoiGia();
+    const tiepTheo = jest.fn();
+
+    phanQuyen('quan_tri')(yeuCau, phanHoi, tiepTheo);
+
+    expect(phanHoi.maTrangThai).toBeUndefined();
+    expect(tiepTheo).toHaveBeenCalledTimes(1);
+  });
 });

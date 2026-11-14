@@ -16,26 +16,43 @@ SportShop la ung dung web quan ly va ban do the thao. Khach hang co the xem san 
 - Tao/xoa ma khuyen mai; xem doanh thu va san pham ban chay.
 
 ## Cong nghe
-- Node.js 18 tro len, Express 4, SQLite (`better-sqlite3`)
+- ASP.NET Core MVC tren .NET 8, Entity Framework Core va SQLite
 - HTML, CSS va JavaScript modules; API xac thuc bang JWT
-- Jest va Supertest cho kiem thu
+- xUnit va ASP.NET Core TestServer cho kiem thu
+- ASP.NET Core hosted service tu huy don qua han va tong hop doanh thu hang ngay
 
 ## Cai dat va chay (Windows PowerShell)
 
 ```powershell
-npm install
-Copy-Item .env.example .env
+dotnet restore backend\SportShop.Mvc\SportShop.Mvc.csproj
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+$env:JWT_SECRET = [Convert]::ToBase64String($bytes)
+npm start
 ```
 
-Sua `.env`: dat `JWT_SECRET` thanh chuoi ngau nhien rieng truoc khi chia se/deploy. Khoi tao CSDL va du lieu demo:
+`JWT_SECRET` phai duoc dat trong moi terminal chay ung dung va co it nhat 32 byte. ASP.NET Core doc cau hinh tu environment variables; file `.env` khong duoc tu dong nap. CSDL mac dinh o `database/quan_ly_sportshop.sqlite`; ung dung ap dung EF Core migrations khi khoi dong.
+
+De tao tai khoan demo va du lieu mau, dat `JWT_SECRET` theo huong dan ben duoi roi chay:
 
 ```powershell
+Copy-Item .env.example .env
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+$env:JWT_SECRET = [Convert]::ToBase64String($bytes)
 npm run db:seed
-npm run dev
 ```
 
-Mo giao dien tai <http://localhost:3000>; API co tien to `/api` va health check tai <http://localhost:3000/api/health>.
-Neu chi can tao cac bang rong, chay `npm run db:init`. `db:seed` chi danh cho moi truong phat trien va tu choi nap mau neu CSDL da co tai khoan, danh muc, san pham hoac khuyen mai.
+Ung dung chay tai <http://localhost:5150>; API co tien to `/api` va health check tai <http://localhost:5150/api/health>. `npm run db:init` ap dung EF Core migrations; ung dung cung tu ap dung migration khi khoi dong. CSDL cu co du bang/cot bat buoc se duoc ghi nhan migration nen ma khong xoa hay sua du lieu. Migration ke tiep bo sung rang buoc du lieu va chi muc con thieu; neu du lieu cu vi pham rang buoc hoac thieu khoa ngoai, migration dung va bao loi de xu ly thu cong, khong tu y sua/xoa du lieu. Schema cu thieu bang/cot bat buoc se bi tu choi ro rang.
+
+`npm run db:seed` dung EF Core de tu ap dung migration va nap mau; chi hoat dong ngoai moi truong production va tu choi nap neu CSDL da co tai khoan, danh muc, san pham hoac khuyen mai. Lenh nay khong can cai dependency Node. EF Core migrations la nguon chinh thuc tao/cap nhat schema; cac file SQL tao bang cu khong con duoc script khoi tao su dung.
+
+Tao migration moi bang local tool da ghim phien ban:
+
+```powershell
+dotnet tool restore
+dotnet tool run dotnet-ef migrations add TenMigration --project backend\SportShop.Mvc\SportShop.Mvc.csproj
+```
 
 Tai khoan demo duoc tao boi `npm run db:seed`:
 
@@ -63,11 +80,12 @@ npm test
 ## Cau truc
 
 ```text
-backend/       Express app, middleware, API modules va tac vu nen
-database/      Schema, chi muc, du lieu mau va lenh khoi tao CSDL
-frontend/      Giao dien, trang, thanh phan va tien ich dung chung
-kiemThu/       Kiem thu API, bao mat, nghiep vu, ton kho va thanh toan
-taiLieu/       Dac ta, huong dan, so do CSDL va backlog
+backend/SportShop.Mvc/ ASP.NET Core MVC controllers, models, services, EF Core va migrations
+backend/modules/       Nguon Node.js cu, chua duoc loai bo khoi repository
+database/              EF migration runner, du lieu mau va script san pham demo
+frontend/              Giao dien, trang, thanh phan va tien ich dung chung
+backend/SportShop.Mvc.Tests/ Kiem thu tich hop backend ASP.NET Core
+taiLieu/                Dac ta, huong dan, so do CSDL va backlog
 ```
 
 ## Tai lieu
