@@ -3,7 +3,8 @@
 > **Thông tin chung:**
 > - **Dự án:** Hệ thống Website Quản lý & Bán hàng Dụng cụ Thể thao (SportShop)
 > - **Quy mô:** 5 thành viên
-> - **Công nghệ:** Node.js (Express), SQLite, Vanilla JavaScript / HTML5 / CSS3, Jest Automation Test
+> - **Công nghệ hiện tại:** ASP.NET Core MVC (.NET 8), Entity Framework Core, SQLite, Vanilla JavaScript / HTML5 / CSS3, xUnit
+> - **Backend Node.js/Express:** mã nguồn cũ còn trong `backend/modules/`; không còn là lệnh chạy mặc định của ứng dụng.
 
 ---
 
@@ -96,12 +97,8 @@
 - **Nhiệm vụ chính:**
   - Thiết kế sơ đồ CSDL, khởi tạo bảng, thiết lập ràng buộc khóa ngoại & chỉ mục tìm kiếm (`database/`).
   - Viết script khởi tạo CSDL và chèn dữ liệu mẫu cho toàn bộ hệ thống (`database/duLieuMau.sql`, `themSanPhamMau.js`).
-  - Xây dựng và thực thi các bộ kiểm thử tự động (Jest Framework) cho 7 nhóm tính năng:
-    - **Kiểm thử API trực tiếp** (`kiemThu/api/`)
-    - **Kiểm thử Bảo mật & Xác thực** (`kiemThu/baoMat/`)
-    - **Kiểm thử Xử lý Đồng thời tồn kho** (`kiemThu/dongThoi/`)
-    - **Kiểm thử Nghiệp vụ Đặt hàng & Khuyến mãi** (`kiemThu/nghiepVu/`)
-    - **Kiểm thử Phân quyền & Thanh toán** (`kiemThu/phanQuyen/`, `thanhToan/`)
+  - Viết và thực thi kiểm thử tích hợp ASP.NET Core (xUnit/TestServer) cho xác thực, phân quyền và giao dịch tồn kho (`backend/SportShop.Mvc.Tests/`).
+  - Bộ Jest cũ còn tại `kiemThu/` để đối chiếu trong quá trình chuyển đổi.
 - **Thư mục quản lý:**
   - `database/`
   - `kiemThu/`

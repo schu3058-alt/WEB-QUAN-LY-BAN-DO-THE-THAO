@@ -14,4 +14,4 @@
 2. Vao "Quan ly san pham" de them/sua/ngung kinh doanh san pham, quan ly danh muc.
 3. Vao "Quan ly don hang" de xem don hang, xac nhan thanh toan va cap nhat trang thai theo trinh tu (cho xac nhan → dang giao → da giao). Don cho xac nhan co the bi huy; hang ton kho duoc hoan lai.
 4. Vao "Bao cao doanh thu" de xem doanh thu theo ngay va san pham ban chay.
-5. Tu dong huy don cho xac nhan qua 48 gio va gui thong bao cho khach hang; tac vu tong hop doanh thu chay khi may chu bat.
+5. Backend tu dong kiem tra moi phut: don `cho_xac_nhan` qua 48 gio se bi huy, hoan ton kho, danh dau yeu cau thanh toan dang cho la that bai va gui thong bao cho khach hang. Moi ngay UTC, backend tong hop doanh thu cua ngay truoc (chi tinh thanh toan da xac nhan) va ghi ket qua vao nhat ky may chu.

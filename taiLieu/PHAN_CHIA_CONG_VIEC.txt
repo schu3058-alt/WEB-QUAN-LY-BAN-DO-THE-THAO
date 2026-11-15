@@ -12,7 +12,8 @@ Thong tin chung:
 
 - Quy mo: 5 thanh vien
 
-- Cong nghe: Node.js (Express), SQLite, Vanilla JS / HTML5 / CSS3, Jest Test
+- Cong nghe hien tai: ASP.NET Core MVC (.NET 8), Entity Framework Core, SQLite, Vanilla JS / HTML5 / CSS3, xUnit
+- Backend Node.js/Express cu van con trong backend/modules/ de doi chieu, khong con la lenh chay mac dinh
 
 
 
@@ -198,7 +199,7 @@ Thong tin chung:
 
   * Viet script khoi tao CSDL va chen du lieu mau cho toan bo he thong (database/duLieuMau.sql, themSanPhamMau.js)
 
-  * Xay dung va thuc thi cac bo kiem thu tu dong (Jest Framework) cho 7 nhom tinh nang:
+  * Xay dung va thuc thi kiem thu tich hop backend ASP.NET Core bang xUnit/TestServer:
 
     + Kiem thu API truc tiep (kiemThu/api/)
 
