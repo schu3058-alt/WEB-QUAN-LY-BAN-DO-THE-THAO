@@ -2,13 +2,23 @@
 const coSoDuLieu = require('../../cauHinh/ketNoiCoSoDuLieu');
 
 const DonHangModel = {
-  taoDonHang({ taiKhoanId, diaChiNhan, soDienThoaiNhan, ghiChu, tongTien }) {
+  taoDonHang({ taiKhoanId, diaChiNhan, soDienThoaiNhan, ghiChu, tongTienGoc = 0, tienGiam = 0, tongTienSauGiam = 0, maKhuyenMai = null, tongTien }) {
     const ketQua = coSoDuLieu
       .prepare(
-        `INSERT INTO don_hang (taiKhoanId, diaChiNhan, soDienThoaiNhan, ghiChu, tongTien, trangThai, ngayTao)
-         VALUES (?, ?, ?, ?, ?, 'cho_xac_nhan', datetime('now'))`
+        `INSERT INTO don_hang (taiKhoanId, diaChiNhan, soDienThoaiNhan, ghiChu, tongTienGoc, tienGiam, tongTienSauGiam, maKhuyenMai, tongTien, trangThai, ngayTao)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'cho_xac_nhan', datetime('now'))`
       )
-      .run(taiKhoanId, diaChiNhan, soDienThoaiNhan, ghiChu, tongTien);
+      .run(
+        taiKhoanId,
+        diaChiNhan,
+        soDienThoaiNhan,
+        ghiChu,
+        tongTienGoc,
+        tienGiam,
+        tongTienSauGiam,
+        maKhuyenMai,
+        tongTien
+      );
     return ketQua.lastInsertRowid;
   },
 

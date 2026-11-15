@@ -6,10 +6,11 @@ const kiemTraDuLieu = require('../../tienIch/kiemTraDuLieu');
 const { taoKhuyenMai, apDungKhuyenMai } = require('./khuyenMai.validation');
 
 const router = express.Router();
+router.use(xacThuc);
 
-router.get('/', KhuyenMaiController.layTatCa);
+router.get('/', phanQuyen('quan_tri'), KhuyenMaiController.layTatCa);
 router.post('/ap-dung', kiemTraDuLieu(apDungKhuyenMai), KhuyenMaiController.apDung);
-router.post('/', xacThuc, phanQuyen('quan_tri'), kiemTraDuLieu(taoKhuyenMai), KhuyenMaiController.taoMoi);
-router.delete('/:id', xacThuc, phanQuyen('quan_tri'), KhuyenMaiController.xoa);
+router.post('/', phanQuyen('quan_tri'), kiemTraDuLieu(taoKhuyenMai), KhuyenMaiController.taoMoi);
+router.delete('/:id', phanQuyen('quan_tri'), KhuyenMaiController.xoa);
 
 module.exports = router;

@@ -2,14 +2,22 @@
 require('dotenv').config();
 
 const moiTruong = process.env.NODE_ENV || 'development';
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET?.trim();
+const cacSecretMacDinh = [
+  'doi_chuoi_bi_mat_nay',
+  'doi_chuoi_bi_mat_nay_truoc_khi_trien_khai',
+];
 
-if (moiTruong === 'production' && (!jwtSecret || jwtSecret === 'doi_chuoi_bi_mat_nay_truoc_khi_trien_khai')) {
-  throw new Error('JWT_SECRET phải được cấu hình bằng một giá trị riêng trước khi chạy production');
+if (
+  !jwtSecret ||
+  Buffer.byteLength(jwtSecret, 'utf8') < 32 ||
+  cacSecretMacDinh.includes(jwtSecret)
+) {
+  throw new Error(`JWT_SECRET phải là giá trị riêng tư, ngẫu nhiên và có ít nhất 32 byte (môi trường: ${moiTruong})`);
 }
 
 const cauHinhBaoMat = {
-  jwtSecret: jwtSecret || 'doi_chuoi_bi_mat_nay',
+  jwtSecret,
   jwtHetHan: process.env.JWT_HET_HAN || '7d',
   soVongMaHoaMatKhau: Number(process.env.SO_VONG_MA_HOA_MAT_KHAU) || 10,
   gioiHanSoYeuCau: Number(process.env.GIOI_HAN_SO_YEU_CAU) || 100,

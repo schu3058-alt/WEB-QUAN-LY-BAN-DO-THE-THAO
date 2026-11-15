@@ -9,6 +9,12 @@ const ThanhToanModel = require('../thanhToan/thanhToan.model');
 
 const DonHangService = {
   xacNhanDatHang(taiKhoanId, thongTinGiaoHang) {
+    if (!thongTinGiaoHang || !thongTinGiaoHang.diaChiNhan || !thongTinGiaoHang.soDienThoaiNhan) {
+      const loi = new Error('Thiếu thông tin giao hàng');
+      loi.maTrangThai = 400;
+      throw loi;
+    }
+
     const { maKhuyenMai, ...thongTinDonHang } = thongTinGiaoHang;
     const taoDonHangGiaoDich = coSoDuLieu.transaction(() => {
       const gioHang = GioHangModel.layGioHangTheoTaiKhoan(taiKhoanId);
@@ -32,11 +38,25 @@ const DonHangService = {
         }
         return { ...dong, gia: sanPham.gia };
       });
+
       const tongTienGoc = thongTinChiTiet.reduce((tong, dong) => tong + dong.gia * dong.soLuong, 0);
-      const tongTien = maKhuyenMai
-        ? KhuyenMaiService.apDung(maKhuyenMai, tongTienGoc).tongTienSauGiam
-        : tongTienGoc;
-      const donHangId = DonHangModel.taoDonHang({ taiKhoanId, ...thongTinDonHang, tongTien });
+      const thongTinKhuyenMai = maKhuyenMai ? KhuyenMaiService.apDung(maKhuyenMai, tongTienGoc) : {
+        ma: null,
+        tongTienGoc,
+        soTienGiam: 0,
+        tongTienSauGiam: tongTienGoc,
+      };
+
+      const donHangId = DonHangModel.taoDonHang({
+        taiKhoanId,
+        ...thongTinDonHang,
+        tongTienGoc: thongTinKhuyenMai.tongTienGoc,
+        tienGiam: thongTinKhuyenMai.soTienGiam,
+        tongTienSauGiam: thongTinKhuyenMai.tongTienSauGiam,
+        maKhuyenMai: thongTinKhuyenMai.ma,
+        tongTien: thongTinKhuyenMai.tongTienSauGiam,
+      });
+
       thongTinChiTiet.forEach((dong) => {
         DonHangModel.themChiTiet(donHangId, {
           sanPhamId: dong.sanPhamId,
@@ -45,6 +65,7 @@ const DonHangService = {
         });
         SanPhamModel.giamSoLuongTon(dong.sanPhamId, dong.soLuong);
       });
+
       GioHangModel.xoaToanBo(taiKhoanId);
       return donHangId;
     });
