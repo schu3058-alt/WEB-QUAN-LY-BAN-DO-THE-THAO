@@ -3,36 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sản phẩm | SportShop</title>
+  <title>Giỏ hàng | SportShop</title>
   <link rel="stylesheet" href="/tepGiaoDien.css">
 </head>
 <body>
   <header class="dau-trang"><div data-vung-dieu-huong></div></header>
-  <main data-trang="danhSachSanPham">
+  <main data-trang="gioHang">
     <div class="tieu-de-trang">
-      <p class="mo-ta">Lựa chọn đồ thể thao phù hợp với bạn</p>
-      <h1>Sản phẩm</h1>
+      <p class="mo-ta">Kiểm tra sản phẩm trước khi đặt hàng</p>
+      <h1>Giỏ hàng</h1>
     </div>
-    <form id="form-tim-kiem" class="thanh-cong-cu">
-      <label class="truong">Tìm sản phẩm
-        <input id="tu-khoa" name="tuKhoa" type="search" placeholder="Ví dụ: giày chạy bộ">
-      </label>
-      <label class="truong">Danh mục
-        <select id="loc-danh-muc" name="danhMucId"><option value="">Tất cả danh mục</option></select>
-      </label>
-      <button class="nut" type="submit">Tìm kiếm</button>
-    </form>
-    <div id="thong-bao-san-pham" class="thong-bao" role="status" hidden></div>
-    <p id="tong-so-san-pham" class="mo-ta"></p>
-    <div id="danh-sach-san-pham" class="luoi-san-pham"></div>
-    <div class="hang-nut">
-      <button id="trang-truoc" class="nut nut-phu" type="button">Trang trước</button>
-      <span id="so-trang"></span>
-      <button id="trang-sau" class="nut nut-phu" type="button">Trang sau</button>
-    </div>
+    <div id="thong-bao-gio-hang" class="thong-bao" role="status" hidden></div>
+    <div id="noi-dung-gio-hang"></div>
   </main>
-  <footer class="chan-trang">SportShop - Lựa chọn chất lượng cho mỗi buổi tập.</footer>
+  <footer class="chan-trang">SportShop - Đồng hành cùng đam mê thể thao.</footer>
   <script type="module" src="/ungDung.js"></script>
-  <script type="module" src="/trang/danhSachSanPham/danhSachSanPham.js"></script>
+  <script type="module" src="/trang/gioHang/gioHang.js"></script>
 </body>
 </html>
