@@ -5,3 +5,7 @@ tepTaiLen/*
 !tepTaiLen/.gitkeep
 *.log
 coverage/
+**/bin/
+**/obj/
+**/TestResults/
+.vs/
