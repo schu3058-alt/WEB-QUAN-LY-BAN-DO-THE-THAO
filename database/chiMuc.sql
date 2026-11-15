@@ -8,10 +8,13 @@ CREATE INDEX IF NOT EXISTS idx_don_hang_taiKhoanId ON don_hang (taiKhoanId);
 CREATE INDEX IF NOT EXISTS idx_don_hang_trangThai ON don_hang (trangThai);
 
 CREATE INDEX IF NOT EXISTS idx_don_hang_chi_tiet_donHangId ON don_hang_chi_tiet (donHangId);
+CREATE INDEX IF NOT EXISTS idx_don_hang_chi_tiet_sanPhamId ON don_hang_chi_tiet (sanPhamId);
 
 CREATE INDEX IF NOT EXISTS idx_gio_hang_chi_tiet_taiKhoanId ON gio_hang_chi_tiet (taiKhoanId);
+CREATE INDEX IF NOT EXISTS idx_gio_hang_chi_tiet_sanPhamId ON gio_hang_chi_tiet (sanPhamId);
 
 CREATE INDEX IF NOT EXISTS idx_danh_gia_sanPhamId ON danh_gia (sanPhamId);
+CREATE INDEX IF NOT EXISTS idx_danh_gia_taiKhoanId ON danh_gia (taiKhoanId);
 
 CREATE INDEX IF NOT EXISTS idx_thong_bao_taiKhoanId ON thong_bao (taiKhoanId);
 
