@@ -25,31 +25,31 @@ Thong tin chung:
 
 
 
-[Thanh vien 1] - Backend Lead & Authentication
+[Thanh vien 1:Chu Minh Son] - Backend Lead & Authentication
 
   + Linh vuc: Core Server, Middleware, Bao mat, Tai khoan
 
 
 
-[Thanh vien 2] - Backend Business Developer
+[Thanh vien 2:Nguyen Thai Nghia] - Backend Business Developer
 
   + Linh vuc: Modules San pham, Don hang, Gio hang, Khuyen mai & Tac vu nen
 
 
 
-[Thanh vien 3] - Frontend Client Developer
+[Thanh vien 3:Chu Thi Thuy Tien] - Frontend Client Developer
 
   + Linh vuc: Giao dien Khach hang (Trang chu, San pham, Gio hang, Thanh toan)
 
 
 
-[Thanh vien 4] - Frontend Admin & UI/UX
+[Thanh vien 4:Luu Van Sang] - Frontend Admin & UI/UX
 
   + Linh vuc: Giao dien Quan tri (Admin Dashboard, Quan ly kho, Doanh thu)
 
 
 
-[Thanh vien 5] - Database Architect & QA Tester
+[Thanh vien 5:Le Huu Phap] - Database Architect & QA Tester
 
   + Linh vuc: Co so du lieu SQLite, Viet & thuc thi bo Kiem thu (Automation Test)
 
