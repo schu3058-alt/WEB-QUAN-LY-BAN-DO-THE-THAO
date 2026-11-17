@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản lý kho | SportShop</title>
+  <link rel="stylesheet" href="/tepGiaoDien.css">
+</head>
+<body>
+  <header class="dau-trang"><div data-vung-dieu-huong></div></header>
+  <main data-trang="quanLyKho">
+    <div class="tieu-de-trang"><p class="mo-ta">Theo dõi tồn kho, nhập hàng và điều chỉnh số lượng</p><h1>Quản lý kho</h1></div>
+    <div data-menu-quan-tri></div>
+    <div id="thong-bao-kho" class="thong-bao" role="status" hidden></div>
+
+    <section id="thong-ke-kho" class="thong-ke thong-ke-rong" aria-label="Tổng quan tồn kho"></section>
+
+    <form id="form-loc-kho" class="thanh-loc">
+      <label class="truong">Tìm sản phẩm<input name="tuKhoa" type="search" maxlength="100" placeholder="Tên sản phẩm hoặc mã"></label>
+      <label class="truong">Danh mục<select name="danhMucId"></select></label>
+      <label class="truong">Trạng thái bán
+        <select name="trangThai">
+          <option value="dang_ban">Đang bán</option>
+          <option value="ngung_kinh_doanh">Ngừng bán</option>
+          <option value="tat_ca">Tất cả</option>
+        </select>
+      </label>
+      <label class="truong">Sắp xếp
+        <select name="sapXep">
+          <option value="ton_tang">Tồn kho thấp trước</option>
+          <option value="ton_giam">Tồn kho cao trước</option>
+          <option value="gia_tri_giam">Giá trị tồn cao trước</option>
+          <option value="ten">Tên A-Z</option>
+        </select>
+      </label>
+      <label class="truong truong-nho">Ngưỡng sắp hết<input name="nguong" type="number" min="0" max="1000" step="1" value="5"></label>
+      <div class="hang-nut"><button id="xoa-loc-kho" class="nut nut-phu" type="button">Bỏ lọc</button><button id="tai-lai-kho" class="nut nut-phu" type="button">Tải lại</button><button id="xuat-csv-kho" class="nut nut-phu" type="button" disabled>Xuất CSV</button></div>
+    </form>
+
+    <div id="tab-tinh-trang" class="chon-nhanh" role="group" aria-label="Lọc theo tình trạng kho"></div>
+    <p id="dem-ket-qua-kho" class="nhan-dem-ket-qua" role="status"></p>
+    <div id="danh-sach-kho"></div>
+    <div id="phan-trang-kho"></div>
+    <p class="ghi-chu">Nhập kho cộng thêm số lượng, Xuất kho trừ bớt (ví dụ hàng hỏng, hao hụt), Đặt thành là kiểm kê và gán đúng số lượng thực tế. Khách đặt hàng sẽ tự trừ tồn kho; nếu tồn kho vừa thay đổi, hệ thống sẽ báo và yêu cầu bạn thao tác lại.</p>
+
+    <section class="khung-noi-dung" style="margin-top:24px">
+      <h2 style="margin-top:0">Nhật ký thao tác trong phiên này</h2>
+      <p class="ghi-chu">Chỉ lưu tạm trên trang, sẽ mất khi tải lại.</p>
+      <ul id="nhat-ky-kho" class="nhat-ky"></ul>
+    </section>
+  </main>
+  <footer class="chan-trang">Khu vực quản trị SportShop.</footer>
+  <script type="module" src="/ungDung.js"></script>
+  <script type="module" src="/trang/quanLyKho/quanLyKho.js"></script>
+</body>
+</html>
