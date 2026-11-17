@@ -345,3 +345,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     vungDanhSach.replaceChildren(taoTheTrong('Không thể tải dữ liệu kho.'));
   }
 });
+
