@@ -78,6 +78,10 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
+                    b.Property<int?>("BienTheId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("bienTheId");
+
                     b.Property<int>("SanPhamId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("sanPhamId");
@@ -92,9 +96,11 @@ namespace SportShop.Mvc.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BienTheId");
+
                     b.HasIndex("SanPhamId");
 
-                    b.HasIndex("TaiKhoanId", "SanPhamId")
+                    b.HasIndex("TaiKhoanId", "BienTheId")
                         .IsUnique();
 
                     b.ToTable("gio_hang_chi_tiet", t =>
@@ -134,6 +140,62 @@ namespace SportShop.Mvc.Data.Migrations
                     b.ToTable("danh_muc", t =>
                         {
                             t.HasCheckConstraint("ck_danh_muc_ten", "length(trim(ten)) > 0");
+                        });
+                });
+
+            modelBuilder.Entity("SportShop.Mvc.Models.InventoryMovement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int>("BienTheId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("bienTheId");
+
+                    b.Property<int?>("DonHangId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("donHangId");
+
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ghiChu");
+
+                    b.Property<string>("Loai")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("loai");
+
+                    b.Property<DateTime>("NgayTao")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ngayTao")
+                        .HasDefaultValueSql("datetime('now')");
+
+                    b.Property<int?>("NguoiThucHienId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("nguoiThucHienId");
+
+                    b.Property<int>("SoLuongThayDoi")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("soLuongThayDoi");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonHangId");
+
+                    b.HasIndex("NguoiThucHienId");
+
+                    b.HasIndex("BienTheId", "NgayTao");
+
+                    b.ToTable("lich_su_ton_kho", t =>
+                        {
+                            t.HasCheckConstraint("ck_lich_su_ton_kho_loai", "loai IN ('ton_dau', 'nhap_kho', 'xuat_kho', 'ban_hang', 'huy_don')");
+
+                            t.HasCheckConstraint("ck_lich_su_ton_kho_soLuongThayDoi", "soLuongThayDoi <> 0");
                         });
                 });
 
@@ -205,7 +267,7 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("taiKhoanId");
 
-                    b.Property<double>("TongTien")
+                    b.Property<decimal>("TongTien")
                         .HasColumnType("REAL")
                         .HasColumnName("tongTien");
 
@@ -234,7 +296,11 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    b.Property<double>("DonGia")
+                    b.Property<int?>("BienTheId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("bienTheId");
+
+                    b.Property<decimal>("DonGia")
                         .HasColumnType("REAL")
                         .HasColumnName("donGia");
 
@@ -251,6 +317,8 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnName("soLuong");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BienTheId");
 
                     b.HasIndex("DonHangId");
 
@@ -287,7 +355,7 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("phuongThuc");
 
-                    b.Property<double>("SoTien")
+                    b.Property<decimal>("SoTien")
                         .HasColumnType("REAL")
                         .HasColumnName("soTien");
 
@@ -321,7 +389,7 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("danhMucId");
 
-                    b.Property<double>("Gia")
+                    b.Property<decimal>("Gia")
                         .HasColumnType("REAL")
                         .HasColumnName("gia");
 
@@ -332,6 +400,11 @@ namespace SportShop.Mvc.Data.Migrations
                     b.Property<string>("MoTa")
                         .HasColumnType("TEXT")
                         .HasColumnName("moTa");
+
+                    b.Property<string>("MonTheThao")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("monTheThao");
 
                     b.Property<DateTime>("NgayTao")
                         .ValueGeneratedOnAdd()
@@ -349,6 +422,11 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ten");
 
+                    b.Property<string>("ThuongHieu")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("thuongHieu");
+
                     b.Property<string>("TrangThai")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -359,6 +437,10 @@ namespace SportShop.Mvc.Data.Migrations
 
                     b.HasIndex("DanhMucId");
 
+                    b.HasIndex("MonTheThao");
+
+                    b.HasIndex("ThuongHieu");
+
                     b.ToTable("san_pham", t =>
                         {
                             t.HasCheckConstraint("ck_san_pham_gia", "gia >= 0");
@@ -366,6 +448,66 @@ namespace SportShop.Mvc.Data.Migrations
                             t.HasCheckConstraint("ck_san_pham_soLuongTon", "soLuongTon >= 0");
 
                             t.HasCheckConstraint("ck_san_pham_trangThai", "trangThai IN ('dang_ban', 'ngung_kinh_doanh')");
+                        });
+                });
+
+            modelBuilder.Entity("SportShop.Mvc.Models.ProductVariant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<string>("KichThuoc")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("kichThuoc");
+
+                    b.Property<string>("MauSac")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("mauSac");
+
+                    b.Property<int>("NguongCanhBao")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("nguongCanhBao");
+
+                    b.Property<int>("SanPhamId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sanPhamId");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("sku")
+                        .UseCollation("NOCASE");
+
+                    b.Property<int>("SoLuongTon")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("soLuongTon");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("trangThai");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SanPhamId");
+
+                    b.HasIndex("Sku")
+                        .IsUnique()
+                        .HasDatabaseName("ux_san_pham_bien_the_sku");
+
+                    b.ToTable("san_pham_bien_the", t =>
+                        {
+                            t.HasCheckConstraint("ck_san_pham_bien_the_nguongCanhBao", "nguongCanhBao >= 0");
+
+                            t.HasCheckConstraint("ck_san_pham_bien_the_soLuongTon", "soLuongTon >= 0");
+
+                            t.HasCheckConstraint("ck_san_pham_bien_the_trangThai", "trangThai IN ('dang_ban', 'ngung_kinh_doanh')");
                         });
                 });
 
@@ -392,7 +534,7 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ngayKetThuc");
 
-                    b.Property<double>("PhanTramGiam")
+                    b.Property<decimal>("PhanTramGiam")
                         .HasColumnType("REAL")
                         .HasColumnName("phanTramGiam");
 
@@ -450,6 +592,11 @@ namespace SportShop.Mvc.Data.Migrations
 
             modelBuilder.Entity("SportShop.Mvc.Models.CartItem", b =>
                 {
+                    b.HasOne("SportShop.Mvc.Models.ProductVariant", "BienThe")
+                        .WithMany("GioHang")
+                        .HasForeignKey("BienTheId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SportShop.Mvc.Models.Product", "SanPham")
                         .WithMany()
                         .HasForeignKey("SanPhamId")
@@ -462,9 +609,36 @@ namespace SportShop.Mvc.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("BienThe");
+
                     b.Navigation("SanPham");
 
                     b.Navigation("TaiKhoan");
+                });
+
+            modelBuilder.Entity("SportShop.Mvc.Models.InventoryMovement", b =>
+                {
+                    b.HasOne("SportShop.Mvc.Models.ProductVariant", "BienThe")
+                        .WithMany("LichSuTonKho")
+                        .HasForeignKey("BienTheId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SportShop.Mvc.Models.Order", "DonHang")
+                        .WithMany()
+                        .HasForeignKey("DonHangId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("SportShop.Mvc.Models.Account", "NguoiThucHien")
+                        .WithMany()
+                        .HasForeignKey("NguoiThucHienId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BienThe");
+
+                    b.Navigation("DonHang");
+
+                    b.Navigation("NguoiThucHien");
                 });
 
             modelBuilder.Entity("SportShop.Mvc.Models.Notification", b =>
@@ -491,6 +665,11 @@ namespace SportShop.Mvc.Data.Migrations
 
             modelBuilder.Entity("SportShop.Mvc.Models.OrderItem", b =>
                 {
+                    b.HasOne("SportShop.Mvc.Models.ProductVariant", "BienThe")
+                        .WithMany("ChiTietDonHang")
+                        .HasForeignKey("BienTheId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SportShop.Mvc.Models.Order", "DonHang")
                         .WithMany("ChiTiet")
                         .HasForeignKey("DonHangId")
@@ -502,6 +681,8 @@ namespace SportShop.Mvc.Data.Migrations
                         .HasForeignKey("SanPhamId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("BienThe");
 
                     b.Navigation("DonHang");
 
@@ -527,6 +708,17 @@ namespace SportShop.Mvc.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("DanhMuc");
+                });
+
+            modelBuilder.Entity("SportShop.Mvc.Models.ProductVariant", b =>
+                {
+                    b.HasOne("SportShop.Mvc.Models.Product", "SanPham")
+                        .WithMany("BienThes")
+                        .HasForeignKey("SanPhamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("SanPham");
                 });
 
             modelBuilder.Entity("SportShop.Mvc.Models.Review", b =>
@@ -573,9 +765,20 @@ namespace SportShop.Mvc.Data.Migrations
 
             modelBuilder.Entity("SportShop.Mvc.Models.Product", b =>
                 {
+                    b.Navigation("BienThes");
+
                     b.Navigation("ChiTietDonHang");
 
                     b.Navigation("DanhGia");
+                });
+
+            modelBuilder.Entity("SportShop.Mvc.Models.ProductVariant", b =>
+                {
+                    b.Navigation("ChiTietDonHang");
+
+                    b.Navigation("GioHang");
+
+                    b.Navigation("LichSuTonKho");
                 });
 #pragma warning restore 612, 618
         }

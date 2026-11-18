@@ -5,25 +5,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SportShop.Mvc.Data;
 using SportShop.Mvc.Models;
+using SportShop.Mvc.Services;
 
 namespace SportShop.Mvc.Controllers;
 
 [Route("api/don-hang")]
 [Authorize]
-public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
+public sealed class DonHangController(SportShopDbContext db, InventoryService inventory) : ApiControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> PlaceOrder(DatHangRequest request)
     {
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
         var cart = await db.GioHang.Where(x => x.TaiKhoanId == CurrentUserId)
-            .Include(x => x.SanPham).ToListAsync();
+            .Include(x => x.SanPham).Include(x => x.BienThe).ToListAsync();
         if (cart.Count == 0)
             return Failure(StatusCodes.Status400BadRequest, "Giỏ hàng đang trống, không thể đặt hàng");
         if (cart.Any(x => x.SanPham.TrangThai != "dang_ban"))
             return Failure(StatusCodes.Status409Conflict, "Có sản phẩm đã ngừng kinh doanh");
-        if (cart.Any(x => x.SanPham.SoLuongTon < x.SoLuong))
-            return Failure(StatusCodes.Status409Conflict, "Có sản phẩm không đủ tồn kho");
+        if (cart.Any(x => x.BienThe is null || x.BienThe.TrangThai != "dang_ban"))
+            return Failure(StatusCodes.Status409Conflict, "Có biến thể không tồn tại hoặc đã ngừng kinh doanh");
+        if (cart.Any(x => x.BienThe!.SoLuongTon < x.SoLuong))
+            return Failure(StatusCodes.Status409Conflict, "Có biến thể không đủ tồn kho");
 
         var originalTotal = cart.Sum(x => x.SanPham.Gia * x.SoLuong);
         var total = originalTotal;
@@ -34,18 +37,6 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
             if (promotion is null || !PromotionIsActive(promotion))
                 return Failure(StatusCodes.Status400BadRequest, "Mã khuyến mãi không hợp lệ hoặc đã hết hạn");
             total -= originalTotal * promotion.PhanTramGiam / 100m;
-        }
-
-        foreach (var item in cart)
-        {
-            var changed = await db.SanPham
-                .Where(x => x.Id == item.SanPhamId && x.SoLuongTon >= item.SoLuong)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.SoLuongTon, x => x.SoLuongTon - item.SoLuong));
-            if (changed != 1)
-            {
-                await transaction.RollbackAsync();
-                return Failure(StatusCodes.Status409Conflict, $"Sản phẩm {item.SanPham.Ten} không đủ tồn kho");
-            }
         }
 
         var order = new Order
@@ -60,6 +51,7 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
             ChiTiet = cart.Select(x => new OrderItem
             {
                 SanPhamId = x.SanPhamId,
+                BienTheId = x.BienTheId,
                 SoLuong = x.SoLuong,
                 DonGia = x.SanPham.Gia,
             }).ToList(),
@@ -67,6 +59,21 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
         db.DonHang.Add(order);
         db.GioHang.RemoveRange(cart);
         await db.SaveChangesAsync();
+        foreach (var item in cart)
+        {
+            if (item.BienTheId is not int variantId
+                || !await inventory.ApplyChangeAsync(
+                    variantId,
+                    -item.SoLuong,
+                    "ban_hang",
+                    $"Xuất kho cho đơn hàng #{order.Id}.",
+                    CurrentUserId,
+                    order.Id))
+            {
+                await transaction.RollbackAsync();
+                return Failure(StatusCodes.Status409Conflict, $"Biến thể của sản phẩm {item.SanPham.Ten} không đủ tồn kho");
+            }
+        }
         await transaction.CommitAsync();
         return await GetOrder(order.Id, CurrentUserId, false);
     }
@@ -127,8 +134,18 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
                 order.ThanhToan.TrangThai = "that_bai";
             foreach (var line in order.ChiTiet)
             {
-                await db.SanPham.Where(x => x.Id == line.SanPhamId)
-                    .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.SoLuongTon, x => x.SoLuongTon + line.SoLuong));
+                if (line.BienTheId is not int variantId
+                    || !await inventory.ApplyChangeAsync(
+                        variantId,
+                        line.SoLuong,
+                        "huy_don",
+                        $"Hoàn kho từ đơn hàng #{order.Id}.",
+                        CurrentUserId,
+                        order.Id))
+                {
+                    await transaction.RollbackAsync();
+                    return Failure(StatusCodes.Status409Conflict, "Không thể hoàn tồn kho cho đơn hàng này.");
+                }
             }
         }
         order.TrangThai = request.TrangThai;
@@ -147,6 +164,7 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
     private async Task<IActionResult> GetOrder(int id, int accountId, bool isAdmin)
     {
         var order = await db.DonHang.AsNoTracking().Include(x => x.ChiTiet).ThenInclude(x => x.SanPham)
+            .Include(x => x.ChiTiet).ThenInclude(x => x.BienThe)
             .SingleOrDefaultAsync(x => x.Id == id && (isAdmin || x.TaiKhoanId == accountId));
         return order is null
             ? Failure(StatusCodes.Status404NotFound, "Không tìm thấy đơn hàng")
@@ -156,6 +174,7 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
     private async Task<object?> OrderView(int id)
     {
         var order = await db.DonHang.AsNoTracking().Include(x => x.ChiTiet).ThenInclude(x => x.SanPham)
+            .Include(x => x.ChiTiet).ThenInclude(x => x.BienThe)
             .SingleOrDefaultAsync(x => x.Id == id);
         return order is null ? null : OrderView(order);
     }
@@ -168,6 +187,9 @@ public sealed class DonHangController(SportShopDbContext db) : ApiControllerBase
         {
             x.Id, x.DonHangId, x.SanPhamId, x.SoLuong, x.DonGia,
             ten = x.SanPham.Ten, hinhAnh = x.SanPham.HinhAnh,
+            sku = x.BienThe == null ? null : x.BienThe.Sku,
+            kichThuoc = x.BienThe == null ? null : x.BienThe.KichThuoc,
+            mauSac = x.BienThe == null ? null : x.BienThe.MauSac,
         }),
     };
 

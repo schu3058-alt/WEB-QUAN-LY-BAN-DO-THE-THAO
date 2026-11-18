@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using SportShop.Mvc.Data;
 using SportShop.Mvc.Models;
 using SportShop.Mvc.Services;
+using Microsoft.AspNetCore.SignalR; // Thêm namespace SignalR
 
 var builder = WebApplication.CreateBuilder(args);
 var isMigrationOnly = args.Contains("--migrate-only", StringComparer.Ordinal);
@@ -18,6 +19,8 @@ if (isSeedOnly && builder.Environment.IsProduction())
     throw new InvalidOperationException("Không nạp tài khoản và dữ liệu demo trong môi trường production.");
 
 var jwtSecret = builder.Configuration["JWT_SECRET"]?.Trim();
+if (string.IsNullOrWhiteSpace(jwtSecret) && builder.Environment.IsDevelopment())
+    jwtSecret = "SportShop_Dev_JWT_Secret_2026_1234567890";
 if ((isMigrationOnly || isSeedOnly) && string.IsNullOrWhiteSpace(jwtSecret))
     jwtSecret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 if (string.IsNullOrWhiteSpace(jwtSecret) || Encoding.UTF8.GetByteCount(jwtSecret) < 32)
@@ -60,8 +63,13 @@ builder.Services
 
 builder.Services.AddDbContext<SportShopDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<InventoryService>();
 builder.Services.AddScoped<OrderMaintenanceService>();
 builder.Services.AddHostedService<OrderMaintenanceHostedService>();
+
+// >>> PHẦN 1 BỔ SUNG: Đăng ký dịch vụ SignalR <<<
+builder.Services.AddSignalR();
+
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -146,7 +154,29 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("api");
+
+// >>> PHẦN 2 BỔ SUNG: Cấu hình Hub SignalR và Endpoint nội bộ nhận thông báo từ Node.js <<<
+app.MapHub<SportShop.Mvc.Hubs.ThongBaoHub>("/hubs/thong-bao");
+
+app.MapPost("/api/internal/day-thong-bao", async (ThongBaoRealtimeDto dto, IHubContext<SportShop.Mvc.Hubs.ThongBaoHub> hub) =>
+{
+    if (!string.IsNullOrEmpty(dto.TaiKhoanId))
+    {
+        await hub.Clients.Group($"user_{dto.TaiKhoanId}").SendAsync("NhanThongBao", dto);
+    }
+    else
+    {
+        await hub.Clients.Group("quan_tri_vien").SendAsync("NhanThongBaoQuanTri", dto);
+    }
+
+    return Results.Ok(new { thanhCong = true });
+});
+// =======================================================================================
+
 app.MapControllerRoute(name: "default", pattern: "{controller=Frontend}/{action=Index}/{id?}");
 app.Run();
+
+// >>> PHẦN 3 BỔ SUNG: Khai báo Record DTO ở cuối file <<<
+public record ThongBaoRealtimeDto(string? TaiKhoanId, string TieuDe, string NoiDung, string Loai);
 
 public partial class Program;

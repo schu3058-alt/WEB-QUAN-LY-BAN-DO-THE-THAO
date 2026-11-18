@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <thead><tr><th>Sản phẩm</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th></th></tr></thead>
         <tbody>${gioHang.danhSach.map((muc) => `
           <tr data-chi-tiet-id="${Number(muc.chiTietId)}">
-            <td><a href="/san-pham/${Number(muc.sanPhamId)}">${thoatHtml(muc.ten)}</a></td>
+            <td><a href="/san-pham/${Number(muc.sanPhamId)}">${thoatHtml(muc.ten)}</a>
+              <br><small>${thoatHtml([muc.sku, muc.kichThuoc, muc.mauSac].filter(Boolean).join(' · ') || 'Biến thể mặc định')}</small></td>
             <td>${dinhDangTienTe(muc.gia)}</td>
             <td><input class="so-luong-gio" type="number" min="1" max="100" value="${Number(muc.soLuong)}" aria-label="Số lượng ${thoatHtml(muc.ten)}"></td>
             <td>${dinhDangTienTe(Number(muc.gia) * Number(muc.soLuong))}</td>

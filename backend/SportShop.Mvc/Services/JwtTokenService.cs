@@ -8,8 +8,23 @@ namespace SportShop.Mvc.Services;
 
 public sealed class JwtTokenService(IConfiguration configuration)
 {
-    private readonly string _secret = configuration["JWT_SECRET"]
-        ?? throw new InvalidOperationException("JWT_SECRET chưa được cấu hình.");
+    private readonly string _secret = ResolveSecret(configuration);
+
+    private static string ResolveSecret(IConfiguration configuration)
+    {
+        var secret = configuration["JWT_SECRET"]?.Trim();
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase))
+                secret = "SportShop_Dev_JWT_Secret_2026_1234567890";
+        }
+
+        if (string.IsNullOrWhiteSpace(secret) || Encoding.UTF8.GetByteCount(secret) < 32)
+            throw new InvalidOperationException("JWT_SECRET chưa được cấu hình hoặc quá ngắn.");
+
+        return secret;
+    }
 
     public string TaoToken(Account account)
     {

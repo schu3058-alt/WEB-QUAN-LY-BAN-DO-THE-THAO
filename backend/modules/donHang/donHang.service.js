@@ -1,11 +1,23 @@
-// Nghiep vu dat hang: chuyen gio hang hop le thanh don hang, tru ton kho, xoa gio hang
+// Nghiep vu dat hang va xu ly don hang (Chuan Bien The & State Machine SQLite)
 const coSoDuLieu = require('../../cauHinh/ketNoiCoSoDuLieu');
 const DonHangModel = require('./donHang.model');
 const GioHangModel = require('../gioHang/gioHang.model');
-const SanPhamModel = require('../sanPham/sanPham.model');
+const KhoHangModel = require('../khoHang/khoHang.model');
+const ThanhVienModel = require('../khachHangThanThiet/thanhVien.model');
 const KhuyenMaiService = require('../khuyenMai/khuyenMai.service');
 const ThongBaoService = require('../thongBao/thongBao.service');
 const ThanhToanModel = require('../thanhToan/thanhToan.model');
+
+// Bản đồ trạng thái hợp lệ (State Machine)
+const LUONG_TRANG_THAI_HOP_LE = {
+  cho_xac_nhan: ['da_xac_nhan', 'da_huy'],
+  da_xac_nhan: ['dang_chuan_bi', 'da_huy'],
+  dang_chuan_bi: ['dang_giao'],
+  dang_giao: ['hoan_thanh', 'giao_that_bai'],
+  giao_that_bai: ['dang_giao', 'da_huy'],
+  hoan_thanh: [],
+  da_huy: []
+};
 
 const DonHangService = {
   xacNhanDatHang(taiKhoanId, thongTinGiaoHang) {
@@ -24,19 +36,24 @@ const DonHangService = {
         throw loi;
       }
 
+      // Kiểm tra tồn kho của từng biến thể trong giỏ hàng
       const thongTinChiTiet = gioHang.map((dong) => {
-        const sanPham = SanPhamModel.timTheoId(dong.sanPhamId);
-        if (!sanPham || sanPham.trangThai !== 'dang_ban') {
-          const loi = new Error(`Sản phẩm ${dong.ten} đã ngừng kinh doanh`);
+        const bienThe = coSoDuLieu
+          .prepare('SELECT id, soLuongTon, giaBan, giaKhuyenMai, trangThai FROM bien_the_san_pham WHERE id = ?')
+          .get(dong.bienTheId);
+
+        if (!bienThe || bienThe.trangThai !== 1) {
+          const loi = new Error(`Phân loại sản phẩm "${dong.ten} - Size: ${dong.kichCo}, Màu: ${dong.mauSac}" đã ngừng kinh doanh`);
           loi.maTrangThai = 409;
           throw loi;
         }
-        if (sanPham.soLuongTon < dong.soLuong) {
-          const loi = new Error(`Sản phẩm ${dong.ten} không đủ tồn kho`);
+        if (bienThe.soLuongTon < dong.soLuong) {
+          const loi = new Error(`Sản phẩm "${dong.ten}" không đủ tồn kho (còn lại: ${bienThe.soLuongTon})`);
           loi.maTrangThai = 409;
           throw loi;
         }
-        return { ...dong, gia: sanPham.gia };
+        const giaApDung = bienThe.giaKhuyenMai !== null ? bienThe.giaKhuyenMai : bienThe.giaBan;
+        return { ...dong, gia: giaApDung };
       });
 
       const tongTienGoc = thongTinChiTiet.reduce((tong, dong) => tong + dong.gia * dong.soLuong, 0);
@@ -57,13 +74,19 @@ const DonHangService = {
         tongTien: thongTinKhuyenMai.tongTienSauGiam,
       });
 
+      // Ghi lịch sử trạng thái ban đầu
+      coSoDuLieu.prepare(`
+        INSERT INTO lich_su_trang_thai_don_hang (donHangId, trangThaiCu, trangThaiMoi, ghiChu)
+        VALUES (?, NULL, 'cho_xac_nhan', 'Khởi tạo đơn hàng mới')
+      `).run(donHangId);
+
+      // Thêm chi tiết đơn hàng và giữ chỗ kho (chờ admin xác nhận hoặc trừ kho trực tiếp tùy nghiệp vụ)
       thongTinChiTiet.forEach((dong) => {
         DonHangModel.themChiTiet(donHangId, {
-          sanPhamId: dong.sanPhamId,
+          bienTheId: dong.bienTheId,
           soLuong: dong.soLuong,
           donGia: dong.gia,
         });
-        SanPhamModel.giamSoLuongTon(dong.sanPhamId, dong.soLuong);
       });
 
       GioHangModel.xoaToanBo(taiKhoanId);
@@ -92,34 +115,69 @@ const DonHangService = {
     return DonHangModel.layTatCa(boLoc);
   },
 
-  capNhatTrangThai(id, trangThai) {
+  capNhatTrangThai(id, trangThai, adminId = null, ghiChu = '') {
     const capNhatGiaoDich = coSoDuLieu.transaction(() => {
       const donHang = this.layChiTiet(id, null, 'quan_tri');
-      if (donHang.trangThai === trangThai) return donHang;
-      const cacTrangThaiHopLe = {
-        cho_xac_nhan: ['dang_giao', 'da_huy'],
-        dang_giao: ['da_giao'],
-        da_giao: [],
-        da_huy: [],
-      };
-      if (!cacTrangThaiHopLe[donHang.trangThai]?.includes(trangThai)) {
-        const loi = new Error('Không thể chuyển đơn hàng sang trạng thái này');
+      const trangThaiHienTai = donHang.trangThai;
+
+      if (trangThaiHienTai === trangThai) return donHang;
+
+      // Kiểm tra luồng trạng thái hợp lệ (State Machine)
+      if (!LUONG_TRANG_THAI_HOP_LE[trangThaiHienTai]?.includes(trangThai)) {
+        const loi = new Error(`Không thể chuyển đơn hàng từ trạng thái [${trangThaiHienTai}] sang [${trangThai}]`);
         loi.maTrangThai = 409;
         throw loi;
       }
+
+      // Xử lý khi đơn hàng chuyển sang 'da_xac_nhan' -> Trừ kho biến thể tự động
+      if (trangThai === 'da_xac_nhan') {
+        const chiTietDon = DonHangModel.layChiTietDonHang(id); // Hoặc thuộc tính donHang.chiTiet tùy model của bạn
+        KhoHangModel.taoPhieuNhapXuat({
+          loaiPhieu: 'XUAT',
+          nguoiThucHienId: adminId || 1,
+          donHangId: id,
+          ghiChu: `Xuất kho tự động cho đơn hàng #${id}`,
+          danhSachChiTiet: chiTietDon.map(c => ({ bienTheId: c.bienTheId, soLuong: c.soLuong }))
+        });
+      }
+
+      // Xử lý khi đơn hàng bị hủy ('da_huy')
       if (trangThai === 'da_huy') {
         const thanhToan = ThanhToanModel.timTheoDonHang(id);
         if (thanhToan?.trangThai === 'da_thanh_toan') {
-          const loi = new Error('Không thể hủy đơn hàng đã thanh toán');
+          const loi = new Error('Không thể hủy đơn hàng đã thanh toán trực tuyến');
           loi.maTrangThai = 409;
           throw loi;
         }
-        donHang.chiTiet.forEach((dong) => SanPhamModel.tangSoLuongTon(dong.sanPhamId, dong.soLuong));
+        // Nếu đã từng xác nhận (tức là đã trừ kho), cần hoàn trả kho
+        if (trangThaiHienTai !== 'cho_xac_nhan') {
+          const chiTietDon = DonHangModel.layChiTietDonHang(id);
+          KhoHangModel.taoPhieuNhapXuat({
+            loaiPhieu: 'HOAN_TRA',
+            nguoiThucHienId: adminId || 1,
+            donHangId: id,
+            ghiChu: `Hoàn kho do hủy đơn hàng #${id}`,
+            danhSachChiTiet: chiTietDon.map(c => ({ bienTheId: c.bienTheId, soLuong: c.soLuong }))
+          });
+        }
       }
+
+      // Xử lý khi hoàn thành đơn hàng ('hoan_thanh') -> Tích điểm cho khách hàng
+      if (trangThai === 'hoan_thanh') {
+        ThanhVienModel.tichDiemTuDonHang(donHang.taiKhoanId, donHang.id, donHang.tongTien);
+      }
+
+      // Ghi lịch sử thay đổi trạng thái
+      coSoDuLieu.prepare(`
+        INSERT INTO lich_su_trang_thai_don_hang (donHangId, trangThaiCu, trangThaiMoi, nguoiCapNhatId, ghiChu)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(id, trangThaiHienTai, trangThai, adminId, ghiChu || `Cập nhật trạng thái thành ${trangThai}`);
+
       const ketQua = DonHangModel.capNhatTrangThai(id, trangThai);
       ThongBaoService.taoThongBaoChoDonHang(donHang.taiKhoanId, trangThai);
       return ketQua;
     });
+
     return capNhatGiaoDich();
   },
 };

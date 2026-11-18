@@ -8,6 +8,8 @@ public sealed class FrontendController(IWebHostEnvironment environment) : Contro
     {
         ["/"] = "trang/trangChu/index.html",
         ["/san-pham"] = "trang/danhSachSanPham/index.html",
+        ["/yeu-thich"] = "trang/yeuThich/index.html",
+        ["/so-sanh"] = "trang/soSanh/index.html",
         ["/gio-hang"] = "trang/gioHang/index.html",
         ["/thanh-toan"] = "trang/thanhToan/index.html",
         ["/dang-nhap"] = "trang/dangNhap/index.html",
@@ -22,6 +24,8 @@ public sealed class FrontendController(IWebHostEnvironment environment) : Contro
 
     [HttpGet("/")]
     [HttpGet("/san-pham")]
+    [HttpGet("/yeu-thich")]
+    [HttpGet("/so-sanh")]
     [HttpGet("/gio-hang")]
     [HttpGet("/thanh-toan")]
     [HttpGet("/dang-nhap")]

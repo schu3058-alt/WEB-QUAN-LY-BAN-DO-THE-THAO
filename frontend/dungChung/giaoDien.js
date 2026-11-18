@@ -35,9 +35,13 @@ export function yeuCauDangNhap() {
   return true;
 }
 
-export async function themVaoGio(sanPhamId, soLuong = 1) {
+export async function themVaoGio(sanPhamId, soLuong = 1, bienTheId = null) {
   if (!yeuCauDangNhap()) return;
-  await api.post('/gio-hang', { sanPhamId: Number(sanPhamId), soLuong: Number(soLuong) });
+  await api.post('/gio-hang', {
+    sanPhamId: Number(sanPhamId),
+    soLuong: Number(soLuong),
+    ...(bienTheId === null ? {} : { bienTheId: Number(bienTheId) }),
+  });
   window.alert('Đã thêm sản phẩm vào giỏ hàng.');
 }
 
