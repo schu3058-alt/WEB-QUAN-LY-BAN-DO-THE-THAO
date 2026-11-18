@@ -5,7 +5,7 @@ using SportShop.Mvc.Models;
 
 namespace SportShop.Mvc.Services;
 
-public sealed class OrderMaintenanceService(SportShopDbContext db)
+public sealed class OrderMaintenanceService(SportShopDbContext db, InventoryService inventory)
 {
     public async Task<int> CancelExpiredOrdersAsync(DateTime utcNow, CancellationToken cancellationToken = default)
     {
@@ -42,11 +42,16 @@ public sealed class OrderMaintenanceService(SportShopDbContext db)
 
             foreach (var line in order.ChiTiet)
             {
-                await db.SanPham
-                    .Where(product => product.Id == line.SanPhamId)
-                    .ExecuteUpdateAsync(
-                        setters => setters.SetProperty(product => product.SoLuongTon, product => product.SoLuongTon + line.SoLuong),
-                        cancellationToken);
+                if (line.BienTheId is not int variantId
+                    || !await inventory.ApplyChangeAsync(
+                        variantId,
+                        line.SoLuong,
+                        "huy_don",
+                        $"Hoàn kho từ đơn hàng quá hạn #{order.Id}.",
+                        null,
+                        order.Id,
+                        cancellationToken))
+                    throw new InvalidOperationException($"Không thể hoàn tồn kho cho đơn hàng quá hạn #{order.Id}.");
             }
 
             db.ThongBao.Add(new Notification

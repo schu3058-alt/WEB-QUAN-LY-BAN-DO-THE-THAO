@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span class="the-trang-thai">${thoatHtml(NHAN_TRANG_THAI_DON_HANG[muc.trangThai] || muc.trangThai)}</span>
         </div>
         <p>Ngày đặt: ${thoatHtml(dinhDangNgay(muc.ngayTao))} · Tổng tiền: <strong>${dinhDangTienTe(muc.tongTien)}</strong></p>
-        <ul>${muc.chiTiet.map((ct) => `<li>${thoatHtml(ct.ten)} × ${Number(ct.soLuong)} — ${dinhDangTienTe(Number(ct.donGia) * Number(ct.soLuong))}</li>`).join('')}</ul>
+        <ul>${muc.chiTiet.map((ct) => `<li>${thoatHtml(ct.ten)}${[ct.sku, ct.kichThuoc, ct.mauSac].filter(Boolean).length ? ` (${thoatHtml([ct.sku, ct.kichThuoc, ct.mauSac].filter(Boolean).join(' · '))})` : ''} × ${Number(ct.soLuong)} — ${dinhDangTienTe(Number(ct.donGia) * Number(ct.soLuong))}</li>`).join('')}</ul>
         ${muc.trangThai === 'da_giao' ? `<a class="nut nut-phu" href="/danh-gia?donHangId=${Number(muc.id)}">Đánh giá sản phẩm</a>` : ''}
       </article>
     `).join('');

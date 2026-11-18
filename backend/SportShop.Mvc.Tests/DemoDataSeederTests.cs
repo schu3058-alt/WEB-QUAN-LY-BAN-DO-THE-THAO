@@ -26,6 +26,12 @@ public sealed class DemoDataSeederTests
             Assert.Equal(2, await db.TaiKhoan.CountAsync());
             Assert.Equal(4, await db.DanhMuc.CountAsync());
             Assert.Equal(4, await db.SanPham.CountAsync());
+            Assert.Equal(10, await db.BienTheSanPham.CountAsync());
+            var stockTotals = await db.SanPham
+                .Select(product => new { product.SoLuongTon, variantTotal = product.BienThes.Sum(variant => variant.SoLuongTon) })
+                .ToListAsync();
+            Assert.All(stockTotals, total => Assert.Equal(total.SoLuongTon, total.variantTotal));
+            Assert.Equal(10, await db.LichSuTonKho.CountAsync());
             Assert.Equal(1, await db.KhuyenMai.CountAsync());
             Assert.True(BCrypt.Net.BCrypt.Verify(
                 "SportShopAdmin123!",

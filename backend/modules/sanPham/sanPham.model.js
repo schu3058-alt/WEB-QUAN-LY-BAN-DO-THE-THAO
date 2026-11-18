@@ -20,6 +20,31 @@ const SanPhamModel = {
     } else if (!trangThai) {
       dieuKien.push("sp.trangThai = 'dang_ban'");
     }
+    // Thêm vào điều kiện trong hàm timKiem(boLoc) của sanPham.model.js (SQLite):
+if (boLoc.thuongHieuId) {
+  dieuKien.push('sp.thuongHieuId = ?');
+  thamSo.push(boLoc.thuongHieuId);
+}
+if (boLoc.monTheThaoId) {
+  dieuKien.push('sp.monTheThaoId = ?');
+  thamSo.push(boLoc.monTheThaoId);
+}
+if (boLoc.kichCo) {
+  dieuKien.push('EXISTS (SELECT 1 FROM bien_the_san_pham bt WHERE bt.sanPhamId = sp.id AND bt.kichCo = ? AND bt.soLuongTon > 0)');
+  thamSo.push(boLoc.kichCo);
+}
+if (boLoc.mauSac) {
+  dieuKien.push('EXISTS (SELECT 1 FROM bien_the_san_pham bt WHERE bt.sanPhamId = sp.id AND bt.mauSac = ? AND bt.soLuongTon > 0)');
+  thamSo.push(boLoc.mauSac);
+}
+if (boLoc.giaTu) {
+  dieuKien.push('EXISTS (SELECT 1 FROM bien_the_san_pham bt WHERE bt.sanPhamId = sp.id AND bt.giaBan >= ?)');
+  thamSo.push(Number(boLoc.giaTu));
+}
+if (boLoc.giaDen) {
+  dieuKien.push('EXISTS (SELECT 1 FROM bien_the_san_pham bt WHERE bt.sanPhamId = sp.id AND bt.giaBan <= ?)');
+  thamSo.push(Number(boLoc.giaDen));
+}
 
     const whereSql = dieuKien.length ? `WHERE ${dieuKien.join(' AND ')}` : '';
     const offset = (trang - 1) * soLuongMoiTrang;

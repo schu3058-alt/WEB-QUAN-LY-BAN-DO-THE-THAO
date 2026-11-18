@@ -54,6 +54,26 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 }
 .thanh-dieu-huong a:not(:first-child) { color: var(--mau-chu); font-weight: 600; }
 
+.hop-thoai-xac-thuc {
+  width: min(460px, calc(100% - 32px));
+  max-width: none;
+  padding: 0;
+  border: 1px solid var(--mau-vien);
+  border-radius: 18px;
+  background: #fff;
+  color: var(--mau-chu);
+  box-shadow: 0 24px 80px rgba(10, 30, 20, .24);
+}
+.hop-thoai-xac-thuc::backdrop { background: rgba(10, 25, 18, .58); backdrop-filter: blur(3px); }
+.noi-dung-hop-thoai { padding: 28px; }
+.dau-hop-thoai { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.dau-hop-thoai h2 { margin: 0; }
+.nhan-hop-thoai { margin: 0 0 4px; color: var(--mau-chinh); font-size: .82rem; font-weight: 800; letter-spacing: .12em; }
+.nut-dong-hop-thoai { width: 38px; height: 38px; border: 1px solid var(--mau-vien); border-radius: 50%; background: #fff; color: var(--mau-chu); cursor: pointer; font-size: 1.5rem; line-height: 1; }
+.nut-dong-hop-thoai:hover { background: #f1f5f2; }
+.nut-gui-xac-thuc { width: 100%; margin-top: 6px; }
+.doi-che-do-xac-thuc { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; color: var(--mau-mo); }
+
 main {
   width: min(1180px, calc(100% - 36px));
   min-height: calc(100vh - 150px);
@@ -103,6 +123,13 @@ h2 { margin-top: 32px; }
 .the-san-pham p:not(.nhan-danh-muc) { color: var(--mau-chinh-dam); font-weight: 800; }
 .nhan-danh-muc { color: var(--mau-mo); font-size: .88rem; }
 .anh-san-pham { display: block; }
+.tuong-tac-san-pham { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 16px 16px; }
+.trang-thai-tuong-tac { flex-basis: 100%; color: var(--mau-mo); font-size: .88rem; }
+.truong-checkbox { display: flex; align-items: center; gap: 8px; }
+.truong-checkbox input { width: auto; min-height: 0; margin: 0; }
+.bang-so-sanh td { min-width: 180px; }
+.bang-so-sanh img { display: block; width: min(180px, 100%); height: 130px; object-fit: cover; }
+.bang-so-sanh + .nut { margin-top: 14px; }
 .banner {
   display: grid;
   min-height: 320px;
@@ -161,6 +188,7 @@ td img { width: 64px; height: 54px; object-fit: cover; border-radius: 7px; }
 @media (max-width: 600px) {
   .thanh-dieu-huong { width: calc(100% - 24px); min-height: 58px; flex-wrap: wrap; gap: 8px 12px; padding: 10px 0; }
   .thanh-dieu-huong a:first-child { flex-basis: 100%; }
+  .noi-dung-hop-thoai { padding: 22px; }
   main { width: calc(100% - 24px); margin-top: 24px; }
   .luoi-san-pham { grid-template-columns: 1fr; }
   .luoi-form, .chi-tiet-san-pham, .thong-ke { grid-template-columns: 1fr; }

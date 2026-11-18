@@ -17,11 +17,18 @@
       <div class="luoi-form">
         <label class="truong">Tên sản phẩm<input name="ten" minlength="2" maxlength="150" required></label>
         <label class="truong">Giá (VND)<input name="gia" type="number" min="1" step="1" required></label>
-        <label class="truong">Số lượng tồn<input name="soLuongTon" type="number" min="0" step="1" required></label>
         <label class="truong">Danh mục<select name="danhMucId" required></select></label>
+        <label class="truong">Thương hiệu<input name="thuongHieu" maxlength="100"></label>
+        <label class="truong">Môn thể thao<input name="monTheThao" maxlength="100"></label>
         <label class="truong">Đường dẫn hình ảnh (URL)<input name="hinhAnh" type="url"></label>
       </div>
       <label class="truong">Mô tả<textarea name="moTa" maxlength="2000"></textarea></label>
+      <section id="khu-vuc-bien-the-moi">
+        <h3>Biến thể và tồn kho ban đầu</h3>
+        <p class="mo-ta">SKU để trống sẽ được tự tạo. Size/màu không bắt buộc; ngưỡng cảnh báo mặc định là 5.</p>
+        <div id="cac-bien-the-moi"></div>
+        <button id="nut-them-bien-the-moi" class="nut nut-phu" type="button">Thêm biến thể</button>
+      </section>
       <div class="hang-nut"><button class="nut" type="submit">Lưu sản phẩm</button><button id="huy-sua" class="nut nut-phu" type="button">Xóa trắng</button></div>
     </form>
     <section class="khung-noi-dung">
@@ -34,6 +41,10 @@
         <button id="huy-sua-danh-muc" class="nut nut-phu" type="button" hidden>Hủy sửa</button>
       </form>
       <div id="danh-sach-danh-muc"></div>
+    </section>
+    <section class="khung-noi-dung">
+      <h2>Cảnh báo tồn kho thấp</h2>
+      <div id="danh-sach-canh-bao"></div>
     </section>
     <section>
       <h2>Danh sách sản phẩm</h2>

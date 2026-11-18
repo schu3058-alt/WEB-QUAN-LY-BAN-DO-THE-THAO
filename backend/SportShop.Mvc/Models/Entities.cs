@@ -81,9 +81,49 @@ public sealed class Product
     [Column("ngayTao")]
     public DateTime NgayTao { get; set; }
 
+    [MaxLength(100), Column("thuongHieu")]
+    public string? ThuongHieu { get; set; }
+
+    [MaxLength(100), Column("monTheThao")]
+    public string? MonTheThao { get; set; }
+
     public Category? DanhMuc { get; set; }
+    public List<ProductVariant> BienThes { get; set; } = [];
     public List<OrderItem> ChiTietDonHang { get; set; } = [];
     public List<Review> DanhGia { get; set; } = [];
+}
+
+[Table("san_pham_bien_the")]
+public sealed class ProductVariant
+{
+    [Key, Column("id")]
+    public int Id { get; set; }
+
+    [Column("sanPhamId")]
+    public int SanPhamId { get; set; }
+
+    [Required, MaxLength(64), Column("sku")]
+    public string Sku { get; set; } = "";
+
+    [MaxLength(32), Column("kichThuoc")]
+    public string? KichThuoc { get; set; }
+
+    [MaxLength(50), Column("mauSac")]
+    public string? MauSac { get; set; }
+
+    [Column("soLuongTon")]
+    public int SoLuongTon { get; set; }
+
+    [Column("nguongCanhBao")]
+    public int NguongCanhBao { get; set; } = 5;
+
+    [Required, MaxLength(30), Column("trangThai")]
+    public string TrangThai { get; set; } = "dang_ban";
+
+    public Product SanPham { get; set; } = null!;
+    public List<CartItem> GioHang { get; set; } = [];
+    public List<OrderItem> ChiTietDonHang { get; set; } = [];
+    public List<InventoryMovement> LichSuTonKho { get; set; } = [];
 }
 
 [Table("gio_hang_chi_tiet")]
@@ -98,11 +138,15 @@ public sealed class CartItem
     [Column("sanPhamId")]
     public int SanPhamId { get; set; }
 
+    [Column("bienTheId")]
+    public int? BienTheId { get; set; }
+
     [Column("soLuong")]
     public int SoLuong { get; set; }
 
     public Account TaiKhoan { get; set; } = null!;
     public Product SanPham { get; set; } = null!;
+    public ProductVariant? BienThe { get; set; }
 }
 
 [Table("don_hang")]
@@ -149,6 +193,9 @@ public sealed class OrderItem
     [Column("sanPhamId")]
     public int SanPhamId { get; set; }
 
+    [Column("bienTheId")]
+    public int? BienTheId { get; set; }
+
     [Column("soLuong")]
     public int SoLuong { get; set; }
 
@@ -157,6 +204,39 @@ public sealed class OrderItem
 
     public Order DonHang { get; set; } = null!;
     public Product SanPham { get; set; } = null!;
+    public ProductVariant? BienThe { get; set; }
+}
+
+[Table("lich_su_ton_kho")]
+public sealed class InventoryMovement
+{
+    [Key, Column("id")]
+    public int Id { get; set; }
+
+    [Column("bienTheId")]
+    public int BienTheId { get; set; }
+
+    [Required, MaxLength(30), Column("loai")]
+    public string Loai { get; set; } = "";
+
+    [Column("soLuongThayDoi")]
+    public int SoLuongThayDoi { get; set; }
+
+    [Column("donHangId")]
+    public int? DonHangId { get; set; }
+
+    [Column("nguoiThucHienId")]
+    public int? NguoiThucHienId { get; set; }
+
+    [MaxLength(500), Column("ghiChu")]
+    public string? GhiChu { get; set; }
+
+    [Column("ngayTao")]
+    public DateTime NgayTao { get; set; }
+
+    public ProductVariant BienThe { get; set; } = null!;
+    public Order? DonHang { get; set; }
+    public Account? NguoiThucHien { get; set; }
 }
 
 [Table("thanh_toan")]
