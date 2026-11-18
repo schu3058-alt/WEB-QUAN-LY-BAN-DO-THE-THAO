@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       vung.innerHTML = `<div class="bang-khung"><table><thead><tr><th>Mã đơn / khách hàng</th><th>Ngày đặt</th><th>Địa chỉ nhận</th><th>SĐT</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái đơn</th><th>Thao tác</th></tr></thead><tbody>
         ${donHang.map((muc) => `<tr data-id="${Number(muc.id)}">
           <td>#${Number(muc.id)}<br>${thoatHtml(muc.tenKhachHang || '')}<br><small>${thoatHtml(muc.email || '')}</small>
-            <details><summary>Chi tiết đơn hàng</summary><ul>${muc.chiTiet.map((dong) => `<li>${thoatHtml(dong.ten)} × ${Number(dong.soLuong)} — ${dinhDangTienTe(Number(dong.donGia) * Number(dong.soLuong))}</li>`).join('')}</ul></details>
+            <details><summary>Chi tiết đơn hàng</summary><ul>${muc.chiTiet.map((dong) => `<li>${thoatHtml(dong.ten)}${[dong.sku, dong.kichThuoc, dong.mauSac].filter(Boolean).length ? ` (${thoatHtml([dong.sku, dong.kichThuoc, dong.mauSac].filter(Boolean).join(' · '))})` : ''} × ${Number(dong.soLuong)} — ${dinhDangTienTe(Number(dong.donGia) * Number(dong.soLuong))}</li>`).join('')}</ul></details>
           </td><td>${thoatHtml(dinhDangNgay(muc.ngayTao))}</td>
           <td>${thoatHtml(muc.diaChiNhan)}</td><td>${thoatHtml(muc.soDienThoaiNhan)}</td><td>${dinhDangTienTe(muc.tongTien)}</td>
           <td>${muc.thanhToan ? `${thoatHtml(NHAN_PHUONG_THUC_THANH_TOAN[muc.thanhToan.phuongThuc] || muc.thanhToan.phuongThuc)}<br>${thoatHtml(NHAN_TRANG_THAI_THANH_TOAN[muc.thanhToan.trangThai] || muc.thanhToan.trangThai)}${muc.thanhToan.trangThai === 'cho_thanh_toan' ? `<br><button class="nut nut-nho nut-xac-nhan-thanh-toan" type="button" data-id="${Number(muc.thanhToan.id)}">Xác nhận</button>` : ''}` : 'Chưa có yêu cầu'}</td>

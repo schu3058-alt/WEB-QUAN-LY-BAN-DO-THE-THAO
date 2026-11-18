@@ -24,7 +24,13 @@ public sealed class LegacyDatabaseMigrationTests
             Assert.Equal("legacy@example.com", await db.TaiKhoan.Select(account => account.Email).SingleAsync());
             Assert.Equal("Legacy category", await db.DanhMuc.Select(category => category.Ten).SingleAsync());
             Assert.Equal("Legacy product", await db.SanPham.Select(product => product.Ten).SingleAsync());
-            Assert.Equal(2, (await db.Database.GetAppliedMigrationsAsync()).Count());
+            Assert.Equal(3, (await db.Database.GetAppliedMigrationsAsync()).Count());
+            Assert.Equal(5, await db.BienTheSanPham.Select(variant => variant.SoLuongTon).SingleAsync());
+            Assert.Equal("SP00001-STD", await db.BienTheSanPham.Select(variant => variant.Sku).SingleAsync());
+            Assert.Equal("ton_dau", await db.LichSuTonKho.Select(movement => movement.Loai).SingleAsync());
+            var variantId = await db.BienTheSanPham.Select(variant => variant.Id).SingleAsync();
+            Assert.Equal(variantId, await db.GioHang.Select(item => item.BienTheId).SingleAsync());
+            Assert.Equal(variantId, await db.ChiTietDonHang.Select(item => item.BienTheId).SingleAsync());
 
             await Assert.ThrowsAsync<SqliteException>(() => db.Database.ExecuteSqlRawAsync(
                 """INSERT INTO "tai_khoan" ("hoTen", "email", "matKhauMaHoa", "vaiTro") VALUES ('Invalid', 'invalid@example.com', 'hash', 'invalid')"""));
@@ -129,6 +135,10 @@ public sealed class LegacyDatabaseMigrationTests
             INSERT INTO danh_muc (ten, slug) VALUES ('Legacy category', 'legacy-category');
             INSERT INTO san_pham (ten, gia, soLuongTon, danhMucId, trangThai, ngayTao)
             VALUES ('Legacy product', 50, 5, 1, 'dang_ban', '2026-01-01');
+            INSERT INTO gio_hang_chi_tiet (taiKhoanId, sanPhamId, soLuong) VALUES (1, 1, 2);
+            INSERT INTO don_hang (taiKhoanId, diaChiNhan, soDienThoaiNhan, tongTien, trangThai, ngayTao)
+            VALUES (1, 'Legacy address', '0901234567', 100, 'cho_xac_nhan', '2026-01-01');
+            INSERT INTO don_hang_chi_tiet (donHangId, sanPhamId, soLuong, donGia) VALUES (1, 1, 2, 50);
             """;
         insert.Parameters.AddWithValue("$role", invalidAccountRole ? "legacy_invalid" : "khach_hang");
         insert.ExecuteNonQuery();

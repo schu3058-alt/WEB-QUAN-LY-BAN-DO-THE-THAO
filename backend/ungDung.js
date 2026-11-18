@@ -17,6 +17,11 @@ const danhGiaRoutes = require('./modules/danhGia');
 const khuyenMaiRoutes = require('./modules/khuyenMai');
 const thongBaoRoutes = require('./modules/thongBao');
 const baoCaoRoutes = require('./modules/baoCao');
+const khoHangRoutes = require('./modules/khoHang');
+const tuongTacRoutes = require('./modules/tuongTacSanPham');
+const doiTraRoutes = require('./modules/doiTra');
+const thanhVienRoutes = require('./modules/khachHangThanThiet');
+const ghiNhatKy = require('./middleware/ghiNhatKy');
 
 const ungDung = express();
 const duongDanGiaoDien = path.resolve(__dirname, '../frontend');
@@ -36,6 +41,10 @@ ungDung.use('/api/danh-gia', danhGiaRoutes);
 ungDung.use('/api/khuyen-mai', khuyenMaiRoutes);
 ungDung.use('/api/thong-bao', thongBaoRoutes);
 ungDung.use('/api/bao-cao', baoCaoRoutes);
+ungDung.use('/api/kho-hang', ghiNhatKy('KhoHang'), khoHangRoutes);
+ungDung.use('/api/tuong-tac', tuongTacRoutes);
+ungDung.use('/api/doi-tra', ghiNhatKy('DoiTra'), doiTraRoutes);
+ungDung.use('/api/thanh-vien', thanhVienRoutes);
 
 ungDung.get('/api/health', (yeuCau, phanHoi) => {
   phanHoi.json({ thanhCong: true, thongBao: 'API SportShop đang hoạt động' });

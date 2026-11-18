@@ -31,6 +31,8 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
     {
         var healthResponse = await _client.GetAsync("/api/health");
         Assert.Equal(HttpStatusCode.OK, healthResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await _client.GetAsync("/yeu-thich")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await _client.GetAsync("/so-sanh")).StatusCode);
         await using (var migrationScope = _factory.Services.CreateAsyncScope())
         {
             var db = migrationScope.ServiceProvider.GetRequiredService<SportShopDbContext>();
@@ -68,12 +70,15 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
         Assert.Equal(HttpStatusCode.Forbidden, deniedAdminRequest.StatusCode);
 
         int discontinuedProductId;
+        int variantId;
+        int categoryId;
         await using (var scope = _factory.Services.CreateAsyncScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<SportShopDbContext>();
             var category = new Category { Ten = "Test", Slug = "test-category" };
             db.DanhMuc.Add(category);
             await db.SaveChangesAsync();
+            categoryId = category.Id;
             db.SanPham.Add(new Product
             {
                 Ten = "Test product",
@@ -94,6 +99,17 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
             };
             db.SanPham.Add(discontinuedProduct);
             await db.SaveChangesAsync();
+            var variant = new ProductVariant
+            {
+                SanPhamId = 1,
+                Sku = "TEST-001",
+                SoLuongTon = 3,
+                NguongCanhBao = 2,
+                TrangThai = "dang_ban",
+            };
+            db.BienTheSanPham.Add(variant);
+            await db.SaveChangesAsync();
+            variantId = variant.Id;
             discontinuedProductId = discontinuedProduct.Id;
         }
 
@@ -110,7 +126,7 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
             Assert.DoesNotContain(discontinuedProductId, publicProductIds);
         }
 
-        var addToCartResponse = await _client.PostAsJsonAsync("/api/gio-hang", new { sanPhamId = 1, soLuong = 2 });
+        var addToCartResponse = await _client.PostAsJsonAsync("/api/gio-hang", new { sanPhamId = 1, bienTheId = variantId, soLuong = 2 });
         Assert.Equal(HttpStatusCode.OK, addToCartResponse.StatusCode);
         using (var cartJson = JsonDocument.Parse(await addToCartResponse.Content.ReadAsStringAsync()))
         {
@@ -129,7 +145,7 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
                 .Select(product => product.SoLuongTon).SingleAsync();
             Assert.Equal(3, stock);
         }
-        addToCartResponse = await _client.PostAsJsonAsync("/api/gio-hang", new { sanPhamId = 1, soLuong = 2 });
+        addToCartResponse = await _client.PostAsJsonAsync("/api/gio-hang", new { sanPhamId = 1, bienTheId = variantId, soLuong = 2 });
         Assert.Equal(HttpStatusCode.OK, addToCartResponse.StatusCode);
         var orderResponse = await _client.PostAsJsonAsync("/api/don-hang", new
         {
@@ -235,6 +251,13 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
         var verifyDb = verifyScope.ServiceProvider.GetRequiredService<SportShopDbContext>();
         var remainingStock = await verifyDb.SanPham.Where(x => x.Id == 1).Select(x => x.SoLuongTon).SingleAsync();
         Assert.Equal(3, remainingStock);
+        Assert.Equal(3, await verifyDb.BienTheSanPham.Where(x => x.Id == variantId)
+            .Select(x => x.SoLuongTon).SingleAsync());
+        Assert.Equal(new[] { "ban_hang", "huy_don" }, await verifyDb.LichSuTonKho
+            .Where(movement => movement.BienTheId == variantId)
+            .OrderBy(movement => movement.Id)
+            .Select(movement => movement.Loai)
+            .ToArrayAsync());
         var canceledPaymentStatus = await verifyDb.ThanhToan.Where(x => x.Id == paymentId)
             .Select(x => x.TrangThai).SingleAsync();
         Assert.Equal("that_bai", canceledPaymentStatus);
@@ -246,6 +269,148 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
             .AnyAsync(notification => notification.TaiKhoanId == 1
                 && notification.NoiDung.Contains("tự động hủy"));
         Assert.True(cancellationNotification);
+
+        var productResponse = await _client.PostAsJsonAsync("/api/san-pham", new
+        {
+            ten = "Variant test product",
+            moTa = "Product for variant inventory tests",
+            gia = 125,
+            danhMucId = categoryId,
+            thuongHieu = "TestBrand",
+            monTheThao = "Chạy bộ",
+            bienThes = new[]
+            {
+                new { sku = "", kichThuoc = "M", mauSac = "Đen", soLuongTon = 2, nguongCanhBao = 5 },
+                new { sku = "CUSTOM-SECOND", kichThuoc = "L", mauSac = "Đỏ", soLuongTon = 10, nguongCanhBao = 2 },
+            },
+        });
+        Assert.Equal(HttpStatusCode.OK, productResponse.StatusCode);
+        using var createdProductJson = JsonDocument.Parse(await productResponse.Content.ReadAsStringAsync());
+        var productData = createdProductJson.RootElement.GetProperty("duLieu");
+        var productId = productData.GetProperty("id").GetInt32();
+        var variants = productData.GetProperty("bienThes").EnumerateArray().ToArray();
+        var firstVariantId = variants[0].GetProperty("id").GetInt32();
+        var secondVariantId = variants[1].GetProperty("id").GetInt32();
+        Assert.Equal(12, productData.GetProperty("soLuongTon").GetInt32());
+        Assert.StartsWith($"SP{productId:D5}-", variants[0].GetProperty("sku").GetString());
+        Assert.Equal("TestBrand", productData.GetProperty("thuongHieu").GetString());
+
+        var cheaperProductResponse = await _client.PostAsJsonAsync("/api/san-pham", new
+        {
+            ten = "Cheaper variant test product",
+            moTa = "Product for price sorting tests",
+            gia = 120,
+            danhMucId = categoryId,
+            thuongHieu = "TestBrand",
+            monTheThao = "Chạy bộ",
+            bienThes = new[] { new { sku = "", kichThuoc = "M", mauSac = "Đen", soLuongTon = 1, nguongCanhBao = 1 } },
+        });
+        Assert.Equal(HttpStatusCode.OK, cheaperProductResponse.StatusCode);
+        using var cheaperProductJson = JsonDocument.Parse(await cheaperProductResponse.Content.ReadAsStringAsync());
+        var cheaperProductId = cheaperProductJson.RootElement.GetProperty("duLieu").GetProperty("id").GetInt32();
+
+        var advancedFilter = await _client.GetAsync(
+            "/api/san-pham?giaTu=120&giaDen=130&kichThuoc=M&mauSac=%C4%90en&chiConHang=true&sapXep=gia_tang_dan");
+        Assert.True(advancedFilter.IsSuccessStatusCode, await advancedFilter.Content.ReadAsStringAsync());
+        using (var advancedFilterJson = JsonDocument.Parse(await advancedFilter.Content.ReadAsStringAsync()))
+        {
+            var products = advancedFilterJson.RootElement.GetProperty("duLieu").GetProperty("danhSach")
+                .EnumerateArray().ToArray();
+            Assert.Equal(new[] { cheaperProductId, productId },
+                products.Select(product => product.GetProperty("id").GetInt32()).ToArray());
+            Assert.Equal(new[] { 120m, 125m },
+                products.Select(product => product.GetProperty("gia").GetDecimal()).ToArray());
+        }
+        var mismatchedVariantFilter = await _client.GetAsync(
+            "/api/san-pham?kichThuoc=M&mauSac=%C4%90%E1%BB%8F");
+        Assert.Equal(HttpStatusCode.OK, mismatchedVariantFilter.StatusCode);
+        using (var mismatchedFilterJson = JsonDocument.Parse(await mismatchedVariantFilter.Content.ReadAsStringAsync()))
+        {
+            var resultIds = mismatchedFilterJson.RootElement.GetProperty("duLieu").GetProperty("danhSach")
+                .EnumerateArray().Select(product => product.GetProperty("id").GetInt32()).ToArray();
+            Assert.DoesNotContain(productId, resultIds);
+        }
+        Assert.Equal(HttpStatusCode.BadRequest,
+            (await _client.GetAsync("/api/san-pham?giaTu=200&giaDen=100")).StatusCode);
+        var filterOptions = await _client.GetAsync("/api/san-pham/tuy-chon-bo-loc");
+        Assert.Equal(HttpStatusCode.OK, filterOptions.StatusCode);
+        using (var filterOptionsJson = JsonDocument.Parse(await filterOptions.Content.ReadAsStringAsync()))
+        {
+            var options = filterOptionsJson.RootElement.GetProperty("duLieu");
+            Assert.Contains("M", options.GetProperty("kichThuoc").EnumerateArray().Select(value => value.GetString()));
+            Assert.Contains("Đen", options.GetProperty("mauSac").EnumerateArray().Select(value => value.GetString()));
+        }
+
+        var duplicateSkuUpdate = await _client.PutAsJsonAsync($"/api/san-pham/bien-the/{firstVariantId}", new
+        {
+            sku = "CUSTOM-SECOND", kichThuoc = "M", mauSac = "Đen", nguongCanhBao = 5,
+        });
+        Assert.Equal(HttpStatusCode.Conflict, duplicateSkuUpdate.StatusCode);
+        var skuUpdate = await _client.PutAsJsonAsync($"/api/san-pham/bien-the/{firstVariantId}", new
+        {
+            sku = "UPDATED-FIRST", kichThuoc = "M", mauSac = "Đen", nguongCanhBao = 5,
+        });
+        Assert.Equal(HttpStatusCode.OK, skuUpdate.StatusCode);
+
+        var brandFilter = await _client.GetAsync("/api/san-pham?thuongHieu=TestBrand&monTheThao=Ch%E1%BA%A1y%20b%E1%BB%99");
+        Assert.Equal(HttpStatusCode.OK, brandFilter.StatusCode);
+        using (var filteredJson = JsonDocument.Parse(await brandFilter.Content.ReadAsStringAsync()))
+        {
+            var resultIds = filteredJson.RootElement.GetProperty("duLieu").GetProperty("danhSach")
+                .EnumerateArray().Select(product => product.GetProperty("id").GetInt32()).ToArray();
+            Assert.Equal(new[] { productId, cheaperProductId }.OrderBy(id => id), resultIds.OrderBy(id => id));
+        }
+
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        Assert.Equal(HttpStatusCode.OK, (await _client.PostAsJsonAsync("/api/gio-hang", new
+        {
+            sanPhamId = productId, bienTheId = firstVariantId, soLuong = 2,
+        })).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await _client.PostAsJsonAsync("/api/gio-hang", new
+        {
+            sanPhamId = productId, bienTheId = secondVariantId, soLuong = 1,
+        })).StatusCode);
+        using (var multiVariantCart = JsonDocument.Parse(await _client.GetStringAsync("/api/gio-hang")))
+        {
+            Assert.Equal(2, multiVariantCart.RootElement.GetProperty("duLieu").GetProperty("danhSach").GetArrayLength());
+        }
+        var multiVariantOrderResponse = await _client.PostAsJsonAsync("/api/don-hang", new
+        {
+            diaChiNhan = "123 Variant Street",
+            soDienThoaiNhan = "0901234567",
+            ghiChu = "variant inventory test",
+        });
+        Assert.Equal(HttpStatusCode.OK, multiVariantOrderResponse.StatusCode);
+        using var multiVariantOrderJson = JsonDocument.Parse(await multiVariantOrderResponse.Content.ReadAsStringAsync());
+        var multiVariantOrderId = multiVariantOrderJson.RootElement.GetProperty("duLieu").GetProperty("id").GetInt32();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", adminToken);
+        Assert.Equal(HttpStatusCode.OK, (await _client.PutAsJsonAsync(
+            $"/api/don-hang/{multiVariantOrderId}/trang-thai", new { trangThai = "da_huy" })).StatusCode);
+
+        using (var lowStockJson = JsonDocument.Parse(await _client.GetStringAsync("/api/kho/canh-bao")))
+        {
+            Assert.Contains(lowStockJson.RootElement.GetProperty("duLieu").EnumerateArray(),
+                variant => variant.GetProperty("bienTheId").GetInt32() == firstVariantId);
+        }
+        var excessiveStockOutput = await _client.PostAsJsonAsync($"/api/kho/bien-the/{firstVariantId}/dieu-chinh", new
+        {
+            loai = "xuat_kho", soLuong = 3, ghiChu = "Test insufficient stock",
+        });
+        Assert.Equal(HttpStatusCode.Conflict, excessiveStockOutput.StatusCode);
+        var stockAdjustment = await _client.PostAsJsonAsync($"/api/kho/bien-the/{firstVariantId}/dieu-chinh", new
+        {
+            loai = "nhap_kho", soLuong = 3, ghiChu = "Test stock receipt",
+        });
+        Assert.Equal(HttpStatusCode.OK, stockAdjustment.StatusCode);
+        using (var historyJson = JsonDocument.Parse(await _client.GetStringAsync($"/api/kho/bien-the/{firstVariantId}/lich-su")))
+        {
+            var movementTypes = historyJson.RootElement.GetProperty("duLieu").EnumerateArray()
+                .Select(movement => movement.GetProperty("loai").GetString()).ToArray();
+            Assert.Contains("ton_dau", movementTypes);
+            Assert.Contains("ban_hang", movementTypes);
+            Assert.Contains("huy_don", movementTypes);
+            Assert.Contains("nhap_kho", movementTypes);
+        }
     }
 }
 

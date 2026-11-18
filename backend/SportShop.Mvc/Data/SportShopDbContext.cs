@@ -8,6 +8,8 @@ public sealed class SportShopDbContext(DbContextOptions<SportShopDbContext> opti
     public DbSet<Account> TaiKhoan => Set<Account>();
     public DbSet<Category> DanhMuc => Set<Category>();
     public DbSet<Product> SanPham => Set<Product>();
+    public DbSet<ProductVariant> BienTheSanPham => Set<ProductVariant>();
+    public DbSet<InventoryMovement> LichSuTonKho => Set<InventoryMovement>();
     public DbSet<CartItem> GioHang => Set<CartItem>();
     public DbSet<Order> DonHang => Set<Order>();
     public DbSet<OrderItem> ChiTietDonHang => Set<OrderItem>();
@@ -42,8 +44,24 @@ public sealed class SportShopDbContext(DbContextOptions<SportShopDbContext> opti
             table.HasCheckConstraint("ck_san_pham_trangThai", "trangThai IN ('dang_ban', 'ngung_kinh_doanh')");
         });
         modelBuilder.Entity<Product>().Property(x => x.NgayTao).HasDefaultValueSql("datetime('now')");
+        modelBuilder.Entity<ProductVariant>().ToTable(table =>
+        {
+            table.HasCheckConstraint("ck_san_pham_bien_the_soLuongTon", "soLuongTon >= 0");
+            table.HasCheckConstraint("ck_san_pham_bien_the_nguongCanhBao", "nguongCanhBao >= 0");
+            table.HasCheckConstraint("ck_san_pham_bien_the_trangThai", "trangThai IN ('dang_ban', 'ngung_kinh_doanh')");
+        });
+        modelBuilder.Entity<ProductVariant>().Property(x => x.Sku).UseCollation("NOCASE");
+        modelBuilder.Entity<ProductVariant>().HasIndex(x => x.Sku).IsUnique()
+            .HasDatabaseName("ux_san_pham_bien_the_sku");
+        modelBuilder.Entity<ProductVariant>().HasIndex(x => x.SanPhamId);
+        modelBuilder.Entity<ProductVariant>().HasOne(x => x.SanPham).WithMany(x => x.BienThes)
+            .HasForeignKey(x => x.SanPhamId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Product>()
+            .HasIndex(x => x.ThuongHieu);
+        modelBuilder.Entity<Product>()
+            .HasIndex(x => x.MonTheThao);
         modelBuilder.Entity<CartItem>()
-            .HasIndex(x => new { x.TaiKhoanId, x.SanPhamId })
+            .HasIndex(x => new { x.TaiKhoanId, x.BienTheId })
             .IsUnique();
         modelBuilder.Entity<CartItem>().ToTable(table =>
             table.HasCheckConstraint("ck_gio_hang_soLuong", "soLuong > 0"));
@@ -57,6 +75,11 @@ public sealed class SportShopDbContext(DbContextOptions<SportShopDbContext> opti
             .WithMany()
             .HasForeignKey(x => x.SanPhamId)
             .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<CartItem>()
+            .HasOne(x => x.BienThe)
+            .WithMany(x => x.GioHang)
+            .HasForeignKey(x => x.BienTheId)
+            .OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<Product>()
             .HasOne(x => x.DanhMuc)
             .WithMany(x => x.SanPham)
@@ -90,6 +113,25 @@ public sealed class SportShopDbContext(DbContextOptions<SportShopDbContext> opti
             .WithMany(x => x.ChiTietDonHang)
             .HasForeignKey(x => x.SanPhamId)
             .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<OrderItem>()
+            .HasOne(x => x.BienThe)
+            .WithMany(x => x.ChiTietDonHang)
+            .HasForeignKey(x => x.BienTheId)
+            .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<InventoryMovement>().ToTable(table =>
+        {
+            table.HasCheckConstraint("ck_lich_su_ton_kho_soLuongThayDoi", "soLuongThayDoi <> 0");
+            table.HasCheckConstraint("ck_lich_su_ton_kho_loai",
+                "loai IN ('ton_dau', 'nhap_kho', 'xuat_kho', 'ban_hang', 'huy_don')");
+        });
+        modelBuilder.Entity<InventoryMovement>().Property(x => x.NgayTao).HasDefaultValueSql("datetime('now')");
+        modelBuilder.Entity<InventoryMovement>().HasIndex(x => new { x.BienTheId, x.NgayTao });
+        modelBuilder.Entity<InventoryMovement>().HasOne(x => x.BienThe).WithMany(x => x.LichSuTonKho)
+            .HasForeignKey(x => x.BienTheId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<InventoryMovement>().HasOne(x => x.DonHang).WithMany()
+            .HasForeignKey(x => x.DonHangId).OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<InventoryMovement>().HasOne(x => x.NguoiThucHien).WithMany()
+            .HasForeignKey(x => x.NguoiThucHienId).OnDelete(DeleteBehavior.SetNull);
         modelBuilder.Entity<Payment>()
             .ToTable(table =>
             {

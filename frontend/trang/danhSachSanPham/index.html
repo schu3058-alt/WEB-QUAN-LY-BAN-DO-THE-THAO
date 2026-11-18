@@ -20,10 +20,43 @@
       <label class="truong">Danh mục
         <select id="loc-danh-muc" name="danhMucId"><option value="">Tất cả danh mục</option></select>
       </label>
+      <label class="truong">Thương hiệu
+        <select id="loc-thuong-hieu" name="thuongHieu"><option value="">Tất cả thương hiệu</option></select>
+      </label>
+      <label class="truong">Môn thể thao
+        <select id="loc-mon-the-thao" name="monTheThao"><option value="">Tất cả môn thể thao</option></select>
+      </label>
+      <label class="truong">Giá từ
+        <input id="gia-tu" name="giaTu" type="number" min="0" step="1000" inputmode="numeric" placeholder="0">
+      </label>
+      <label class="truong">Giá đến
+        <input id="gia-den" name="giaDen" type="number" min="0" step="1000" inputmode="numeric" placeholder="Không giới hạn">
+      </label>
+      <label class="truong">Kích thước
+        <select id="loc-kich-thuoc" name="kichThuoc"><option value="">Tất cả kích thước</option></select>
+      </label>
+      <label class="truong">Màu sắc
+        <select id="loc-mau-sac" name="mauSac"><option value="">Tất cả màu sắc</option></select>
+      </label>
+      <label class="truong">Sắp xếp
+        <select id="sap-xep" name="sapXep">
+          <option value="moi_nhat">Mới nhất</option>
+          <option value="gia_tang_dan">Giá thấp đến cao</option>
+          <option value="gia_giam_dan">Giá cao đến thấp</option>
+          <option value="ten_a_z">Tên A-Z</option>
+        </select>
+      </label>
+      <label class="truong truong-checkbox"><input id="chi-con-hang" name="chiConHang" type="checkbox"> Chỉ xem hàng còn tồn</label>
       <button class="nut" type="submit">Tìm kiếm</button>
+      <a class="nut nut-phu" href="/san-pham">Xóa bộ lọc</a>
     </form>
     <div id="thong-bao-san-pham" class="thong-bao" role="status" hidden></div>
     <p id="tong-so-san-pham" class="mo-ta"></p>
+    <section id="san-pham-vua-xem" aria-labelledby="tieu-de-vua-xem" hidden>
+      <h2 id="tieu-de-vua-xem">Bạn vừa xem</h2>
+      <div id="thong-bao-vua-xem" class="thong-bao" role="status" hidden></div>
+      <div id="danh-sach-vua-xem" class="luoi-san-pham"></div>
+    </section>
     <div id="danh-sach-san-pham" class="luoi-san-pham"></div>
     <div class="hang-nut">
       <button id="trang-truoc" class="nut nut-phu" type="button">Trang trước</button>

@@ -26,14 +26,43 @@ public sealed class GioHangController(SportShopDbContext db) : ApiControllerBase
         var product = await db.SanPham.SingleOrDefaultAsync(x => x.Id == request.SanPhamId);
         if (product is null || product.TrangThai != "dang_ban")
             return Failure(StatusCodes.Status404NotFound, "Sản phẩm không tồn tại hoặc đã ngừng kinh doanh");
+
+        var variants = db.BienTheSanPham.Where(variant =>
+            variant.SanPhamId == product.Id && variant.TrangThai == "dang_ban");
+        int variantId;
+        if (request.BienTheId.HasValue)
+        {
+            variantId = request.BienTheId.Value;
+        }
+        else
+        {
+            var availableVariants = await variants.Select(variant => variant.Id).Take(2).ToListAsync();
+            if (availableVariants.Count != 1)
+                return Failure(StatusCodes.Status400BadRequest, "Vui lòng chọn biến thể sản phẩm.");
+            variantId = availableVariants[0];
+        }
+
+        var variant = await variants.SingleOrDefaultAsync(item => item.Id == variantId);
+        if (variant is null)
+            return Failure(StatusCodes.Status404NotFound, "Biến thể không tồn tại hoặc đã ngừng kinh doanh");
         var item = await db.GioHang.SingleOrDefaultAsync(x =>
-            x.TaiKhoanId == CurrentUserId && x.SanPhamId == request.SanPhamId);
-        if (product.SoLuongTon < (item?.SoLuong ?? 0) + request.SoLuong)
+            x.TaiKhoanId == CurrentUserId && x.BienTheId == variantId);
+        if (variant.SoLuongTon < (item?.SoLuong ?? 0) + request.SoLuong)
             return Failure(StatusCodes.Status409Conflict, "Số lượng đặt vượt quá tồn kho hiện có");
         if (item is null)
-            db.GioHang.Add(new CartItem { TaiKhoanId = CurrentUserId, SanPhamId = request.SanPhamId, SoLuong = request.SoLuong });
+        {
+            db.GioHang.Add(new CartItem
+            {
+                TaiKhoanId = CurrentUserId,
+                SanPhamId = product.Id,
+                BienTheId = variantId,
+                SoLuong = request.SoLuong,
+            });
+        }
         else
+        {
             item.SoLuong += request.SoLuong;
+        }
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
         return await Get();
@@ -43,13 +72,14 @@ public sealed class GioHangController(SportShopDbContext db) : ApiControllerBase
     public async Task<IActionResult> Update(int chiTietId, UpdateCartItemRequest request)
     {
         await using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        var item = await db.GioHang.Include(x => x.SanPham).SingleOrDefaultAsync(x =>
-            x.Id == chiTietId && x.TaiKhoanId == CurrentUserId);
+        var item = await db.GioHang.Include(x => x.SanPham).Include(x => x.BienThe)
+            .SingleOrDefaultAsync(x => x.Id == chiTietId && x.TaiKhoanId == CurrentUserId);
         if (item is null)
             return Failure(StatusCodes.Status404NotFound, "Không tìm thấy sản phẩm trong giỏ hàng");
-        if (item.SanPham.TrangThai != "dang_ban")
-            return Failure(StatusCodes.Status409Conflict, "Sản phẩm không tồn tại hoặc đã ngừng kinh doanh");
-        if (request.SoLuong > item.SanPham.SoLuongTon)
+        if (item.SanPham.TrangThai != "dang_ban" || item.BienThe is null
+            || item.BienThe.TrangThai != "dang_ban")
+            return Failure(StatusCodes.Status409Conflict, "Sản phẩm hoặc biến thể đã ngừng kinh doanh");
+        if (request.SoLuong > item.BienThe.SoLuongTon)
             return Failure(StatusCodes.Status409Conflict, "Số lượng sản phẩm vượt quá tồn kho hiện có");
 
         item.SoLuong = request.SoLuong;
@@ -80,15 +110,24 @@ public sealed class GioHangController(SportShopDbContext db) : ApiControllerBase
                 ten = x.SanPham.Ten,
                 gia = x.SanPham.Gia,
                 hinhAnh = x.SanPham.HinhAnh,
+                sku = x.BienThe == null ? null : x.BienThe.Sku,
+                kichThuoc = x.BienThe == null ? null : x.BienThe.KichThuoc,
+                mauSac = x.BienThe == null ? null : x.BienThe.MauSac,
+                bienTheId = x.BienTheId,
             }).ToListAsync();
-        return items.Select(x => new CartRow(x.chiTietId, x.soLuong, x.sanPhamId, x.ten, x.gia, x.hinhAnh)).ToList();
+        return items.Select(x => new CartRow(
+            x.chiTietId, x.soLuong, x.sanPhamId, x.ten, x.gia, x.hinhAnh,
+            x.sku, x.kichThuoc, x.mauSac, x.bienTheId)).ToList();
     }
 
-    private sealed record CartRow(int chiTietId, int soLuong, int sanPhamId, string ten, decimal gia, string? hinhAnh);
+    private sealed record CartRow(
+        int chiTietId, int soLuong, int sanPhamId, string ten, decimal gia, string? hinhAnh,
+        string? sku, string? kichThuoc, string? mauSac, int? bienTheId);
 
     public sealed record AddCartItemRequest(
         [param: Range(1, int.MaxValue)] int SanPhamId,
-        [param: Range(1, 1000)] int SoLuong);
+        [param: Range(1, 1000)] int SoLuong,
+        [param: Range(1, int.MaxValue)] int? BienTheId);
 
     public sealed record UpdateCartItemRequest([param: Range(1, 1000)] int SoLuong);
 }
