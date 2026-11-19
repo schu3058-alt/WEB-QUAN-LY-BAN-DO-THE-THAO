@@ -15,9 +15,16 @@
 
 * { box-sizing: border-box; }
 
+html {
+  min-height: 100%;
+  overflow-y: auto;
+}
+
 body {
   min-width: 320px;
+  min-height: 100%;
   margin: 0;
+  overflow-x: hidden;
   background: var(--mau-nen);
   color: var(--mau-chu);
   line-height: 1.55;

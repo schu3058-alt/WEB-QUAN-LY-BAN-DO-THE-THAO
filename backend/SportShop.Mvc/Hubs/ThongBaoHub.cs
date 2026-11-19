@@ -1,18 +1,30 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace SportShop.Mvc.Hubs
 {
+    [Authorize]
     public class ThongBaoHub : Hub
     {
-        // Khách hàng tham gia kênh riêng theo TaiKhoanId để nhận cập nhật đơn hàng
         public async Task ThamGiaKenhCaNhan(string taiKhoanId)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{taiKhoanId}");
+            var currentUserId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(taiKhoanId, out var requestedUserId)
+                || !int.TryParse(currentUserId, out var authenticatedUserId)
+                || requestedUserId != authenticatedUserId)
+            {
+                throw new HubException("Không được phép tham gia kênh thông báo của tài khoản khác.");
+            }
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{authenticatedUserId}");
         }
 
-        // Admin/Nhân viên tham gia kênh quản trị để nhận cảnh báo đơn mới & hết hàng
         public async Task ThamGiaKenhQuanTri()
         {
+            if (!Context.User?.IsInRole("quan_tri") ?? true)
+                throw new HubException("Chỉ quản trị viên mới được tham gia kênh quản trị.");
+
             await Groups.AddToGroupAsync(Context.ConnectionId, "quan_tri_vien");
         }
     }

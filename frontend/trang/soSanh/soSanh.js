@@ -1,4 +1,4 @@
-import { hienThiThongBao, taoTheTrong, thoatHtml, xuLyLoi } from '../../dungChung/giaoDien.js';
+import { hienThiThongBao, taoTheTrong, thoatHtml, thoatUrlAnh, xuLyLoi } from '../../dungChung/giaoDien.js';
 import {
   layIdsSoSanh,
   taiSanPhamTheoIds,
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <thead><tr><th scope="col">Thông tin</th>${sanPham.map((muc) => `
             <th scope="col"><a href="/san-pham/${Number(muc.id)}">${thoatHtml(muc.ten)}</a></th>`).join('')}</tr></thead>
           <tbody>
-            ${dong('Ảnh', (muc) => `<img src="${thoatHtml(muc.hinhAnh || '/hinh-anh-san-pham/san-pham-placeholder.svg')}" alt="${thoatHtml(muc.ten)}">`)}
+            ${dong('Ảnh', (muc) => `<img src="${thoatUrlAnh(muc.hinhAnh)}" alt="${thoatHtml(muc.ten)}">`)}
             ${dong('Giá', (muc) => `<strong>${dinhDangTienTe(muc.gia)}</strong>`)}
             ${dong('Danh mục', (muc) => thoatHtml(muc.tenDanhMuc || '—'))}
             ${dong('Thương hiệu', (muc) => thoatHtml(muc.thuongHieu || '—'))}

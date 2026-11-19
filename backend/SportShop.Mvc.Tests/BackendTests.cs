@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -24,6 +25,63 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
     {
         _factory = factory;
         _client = factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task InternalNotificationsAndSignalRRequireAuthorization()
+    {
+        var payload = JsonContent.Create(new
+        {
+            tieuDe = "Test",
+            noiDung = "Test notification",
+            loai = "test",
+        });
+
+        var missingKeyResponse = await _client.PostAsync("/api/internal/day-thong-bao", payload);
+        Assert.Equal(HttpStatusCode.Unauthorized, missingKeyResponse.StatusCode);
+
+        using var wrongKeyRequest = new HttpRequestMessage(HttpMethod.Post, "/api/internal/day-thong-bao")
+        {
+            Content = JsonContent.Create(new
+            {
+                tieuDe = "Test",
+                noiDung = "Test notification",
+                loai = "test",
+            }),
+        };
+        wrongKeyRequest.Headers.Add("X-Internal-Api-Key", "wrong-key");
+        var wrongKeyResponse = await _client.SendAsync(wrongKeyRequest);
+        Assert.Equal(HttpStatusCode.Unauthorized, wrongKeyResponse.StatusCode);
+
+        using var validKeyRequest = new HttpRequestMessage(HttpMethod.Post, "/api/internal/day-thong-bao")
+        {
+            Content = JsonContent.Create(new
+            {
+                tieuDe = "Test",
+                noiDung = "Test notification",
+                loai = "test",
+            }),
+        };
+        validKeyRequest.Headers.Add("X-Internal-Api-Key", SportShopFactory.InternalNotificationKey);
+        var validKeyResponse = await _client.SendAsync(validKeyRequest);
+        Assert.Equal(HttpStatusCode.OK, validKeyResponse.StatusCode);
+
+        var signalRResponse = await _client.PostAsync(
+            "/hubs/thong-bao/negotiate?negotiateVersion=1",
+            null);
+        Assert.Equal(HttpStatusCode.Unauthorized, signalRResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task UnconfiguredCorsOriginDoesNotReceiveCorsHeaders()
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/health");
+        request.Headers.Add("Origin", "https://untrusted.example");
+
+        var response = await _client.SendAsync(request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.False(response.Headers.Contains("Access-Control-Allow-Origin"));
     }
 
     [Fact]
@@ -64,6 +122,8 @@ public sealed class BackendTests : IClassFixture<SportShopFactory>
         using var registrationJson = JsonDocument.Parse(await registrationResponse.Content.ReadAsStringAsync());
         var token = registrationJson.RootElement.GetProperty("duLieu").GetProperty("token").GetString();
         Assert.False(string.IsNullOrWhiteSpace(token));
+        var parsedToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        Assert.InRange(parsedToken.ValidTo, DateTime.UtcNow.AddHours(1), DateTime.UtcNow.AddHours(3));
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var deniedAdminRequest = await _client.PostAsJsonAsync("/api/san-pham", new { });
@@ -418,11 +478,15 @@ public sealed class SportShopFactory : WebApplicationFactory<Program>
 {
     private readonly string _databasePath = Path.Combine(Path.GetTempPath(), $"sportshop-test-{Guid.NewGuid():N}.sqlite");
     private const string JwtSecret = "sportshop-integration-test-secret-minimum-32-bytes";
+    public const string InternalNotificationKey = "sportshop-integration-internal-key";
+    private const string JwtLifetime = "2h";
 
     public SportShopFactory()
     {
         Environment.SetEnvironmentVariable("JWT_SECRET", JwtSecret);
         Environment.SetEnvironmentVariable("DUONG_DAN_CSDL", _databasePath);
+        Environment.SetEnvironmentVariable("THONG_BAO_NOI_BO_KEY", InternalNotificationKey);
+        Environment.SetEnvironmentVariable("JWT_HET_HAN", JwtLifetime);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) =>
@@ -440,5 +504,7 @@ public sealed class SportShopFactory : WebApplicationFactory<Program>
         }
         Environment.SetEnvironmentVariable("JWT_SECRET", null);
         Environment.SetEnvironmentVariable("DUONG_DAN_CSDL", null);
+        Environment.SetEnvironmentVariable("THONG_BAO_NOI_BO_KEY", null);
+        Environment.SetEnvironmentVariable("JWT_HET_HAN", null);
     }
 }

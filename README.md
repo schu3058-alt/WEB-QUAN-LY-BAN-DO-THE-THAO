@@ -33,6 +33,10 @@ npm start
 
 `JWT_SECRET` phai duoc dat trong moi terminal chay ung dung va co it nhat 32 byte. ASP.NET Core doc cau hinh tu environment variables; file `.env` khong duoc tu dong nap. CSDL mac dinh o `database/quan_ly_sportshop.sqlite`; ung dung ap dung EF Core migrations khi khoi dong.
 
+Neu su dung endpoint noi bo day thong bao realtime, dat them `THONG_BAO_NOI_BO_KEY` trong bien moi truong va gui cung gia tri qua header `X-Internal-Api-Key`. Endpoint tu choi yeu cau neu chua cau hinh khoa nay.
+
+Neu frontend chay khac domain/port backend, dat `CORS_ALLOWED_ORIGINS` la danh sach origin cach nhau bang dau phay, vi du `https://shop.example.com,https://admin.example.com`. De trong bien nay neu frontend duoc phuc vu cung origin voi backend.
+
 De tao tai khoan demo va du lieu mau, dat `JWT_SECRET` theo huong dan ben duoi roi chay:
 
 ```powershell
@@ -77,6 +81,8 @@ Lenh co the chay lai an toan: khong tao trung san pham va se tao/cap nhat anh no
 npm test
 ```
 
+`npm test` chay test tich hop ASP.NET Core. Lenh `npm run test:node-legacy` chi danh cho backend Node.js cu va co the can moi truong Node.js/native dependency phu hop.
+
 ## Cau truc
 
 ```text
@@ -87,6 +93,8 @@ frontend/              Giao dien, trang, thanh phan va tien ich dung chung
 backend/SportShop.Mvc.Tests/ Kiem thu tich hop backend ASP.NET Core
 taiLieu/                Dac ta, huong dan, so do CSDL va backlog
 ```
+
+`backend/modules/` va `backend/ungDung.js` la backend Node.js cu, chi giu de doi chieu va khong duoc su dung trong lenh chay mac dinh. Khong them tinh nang moi vao khu vuc nay; backend chinh la `backend/SportShop.Mvc/`.
 
 ## Tai lieu
 

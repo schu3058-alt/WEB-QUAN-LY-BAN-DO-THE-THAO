@@ -11,6 +11,17 @@ export function thoatHtml(giaTri = '') {
   })[kyTu]);
 }
 
+export function thoatUrlAnh(giaTri = '') {
+  const giaTriMacDinh = '/hinh-anh-san-pham/san-pham-placeholder.svg';
+  try {
+    const url = new URL(String(giaTri || giaTriMacDinh), location.origin);
+    if (!['http:', 'https:'].includes(url.protocol)) return giaTriMacDinh;
+    return thoatHtml(url.href);
+  } catch {
+    return giaTriMacDinh;
+  }
+}
+
 export function hienThiThongBao(vung, noiDung, loai = 'thanh-cong') {
   if (!vung) return;
   vung.textContent = noiDung;

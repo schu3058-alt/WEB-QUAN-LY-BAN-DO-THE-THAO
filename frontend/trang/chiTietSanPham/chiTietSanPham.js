@@ -1,6 +1,6 @@
 import { api } from '../../dungChung/api.js';
 import { dinhDangNgay } from '../../dungChung/dinhDang.js';
-import { hienThiThongBao, taoTheTrong, themVaoGio, thoatHtml, xuLyLoi } from '../../dungChung/giaoDien.js';
+import { hienThiThongBao, taoTheTrong, themVaoGio, thoatHtml, thoatUrlAnh, xuLyLoi } from '../../dungChung/giaoDien.js';
 import { ghiNhanSanPhamVuaXem, layIdsVuaXem, taiSanPhamTheoIds } from '../../dungChung/tienIchMuaSam.js';
 import { taoTheSanPham, taoNhomTuongTacSanPham } from '../../thanhPhan/thanhPhanTheSanPham.js';
 
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bienThes = sanPham.bienThes || [];
     document.title = `${sanPham.ten} | SportShop`;
     vungChiTiet.innerHTML = `
-      <img src="${thoatHtml(sanPham.hinhAnh || '/hinh-anh-san-pham/san-pham-placeholder.svg')}" alt="${thoatHtml(sanPham.ten)}">
+      <img src="${thoatUrlAnh(sanPham.hinhAnh)}" alt="${thoatHtml(sanPham.ten)}">
       <div>
         <p class="mo-ta">${thoatHtml(sanPham.tenDanhMuc || 'Đồ thể thao')}</p>
         <h1>${thoatHtml(sanPham.ten)}</h1>

@@ -15,12 +15,11 @@ using Microsoft.AspNetCore.SignalR; // Thêm namespace SignalR
 var builder = WebApplication.CreateBuilder(args);
 var isMigrationOnly = args.Contains("--migrate-only", StringComparer.Ordinal);
 var isSeedOnly = args.Contains("--seed-only", StringComparer.Ordinal);
+var internalNotificationKey = builder.Configuration["THONG_BAO_NOI_BO_KEY"]?.Trim();
 if (isSeedOnly && builder.Environment.IsProduction())
     throw new InvalidOperationException("Không nạp tài khoản và dữ liệu demo trong môi trường production.");
 
 var jwtSecret = builder.Configuration["JWT_SECRET"]?.Trim();
-if (string.IsNullOrWhiteSpace(jwtSecret) && builder.Environment.IsDevelopment())
-    jwtSecret = "SportShop_Dev_JWT_Secret_2026_1234567890";
 if ((isMigrationOnly || isSeedOnly) && string.IsNullOrWhiteSpace(jwtSecret))
     jwtSecret = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
 if (string.IsNullOrWhiteSpace(jwtSecret) || Encoding.UTF8.GetByteCount(jwtSecret) < 32)
@@ -70,8 +69,14 @@ builder.Services.AddHostedService<OrderMaintenanceHostedService>();
 // >>> PHẦN 1 BỔ SUNG: Đăng ký dịch vụ SignalR <<<
 builder.Services.AddSignalR();
 
+var allowedCorsOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]?
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    ?? Array.Empty<string>();
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
-    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+{
+    if (allowedCorsOrigins.Length > 0)
+        policy.WithOrigins(allowedCorsOrigins).AllowAnyHeader().AllowAnyMethod();
+}));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -153,13 +158,26 @@ app.UseCors();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers().RequireRateLimiting("api");
+app.MapControllers();
 
 // >>> PHẦN 2 BỔ SUNG: Cấu hình Hub SignalR và Endpoint nội bộ nhận thông báo từ Node.js <<<
 app.MapHub<SportShop.Mvc.Hubs.ThongBaoHub>("/hubs/thong-bao");
 
-app.MapPost("/api/internal/day-thong-bao", async (ThongBaoRealtimeDto dto, IHubContext<SportShop.Mvc.Hubs.ThongBaoHub> hub) =>
+app.MapPost("/api/internal/day-thong-bao", async (
+    HttpRequest request,
+    ThongBaoRealtimeDto dto,
+    IHubContext<SportShop.Mvc.Hubs.ThongBaoHub> hub) =>
 {
+    var requestKey = request.Headers["X-Internal-Api-Key"].ToString();
+    if (string.IsNullOrEmpty(internalNotificationKey)
+        || string.IsNullOrEmpty(requestKey)
+        || !CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(requestKey),
+            Encoding.UTF8.GetBytes(internalNotificationKey)))
+    {
+        return Results.Unauthorized();
+    }
+
     if (!string.IsNullOrEmpty(dto.TaiKhoanId))
     {
         await hub.Clients.Group($"user_{dto.TaiKhoanId}").SendAsync("NhanThongBao", dto);
@@ -170,7 +188,7 @@ app.MapPost("/api/internal/day-thong-bao", async (ThongBaoRealtimeDto dto, IHubC
     }
 
     return Results.Ok(new { thanhCong = true });
-});
+}).RequireRateLimiting("api");
 // =======================================================================================
 
 app.MapControllerRoute(name: "default", pattern: "{controller=Frontend}/{action=Index}/{id?}");
